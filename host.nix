@@ -35,7 +35,7 @@ in
   #        },
   #        "CORE_RPC": {
   #          "USERNAME": "top-energy",
-  #          "PASSWORD": "$${bitcoind-testnet-rpc-psk}",
+  #          "PASSWORD": "${bitcoind-testnet-rpc-psk}",
   #          "PORT": 18332
   #        },
   #        "ELECTRUM": {
@@ -49,7 +49,7 @@ in
   #          "PORT": 3306,
   #          "DATABASE": "topenergy",
   #          "USERNAME": "topenergy",
-  #          "PASSWORD": "$${op-energy-db-psk-testnet}"
+  #          "PASSWORD": "${op-energy-db-psk-testnet}"
   #        },
   #        "STATISTICS": {
   #          "ENABLED": true,
@@ -73,7 +73,7 @@ in
           },
           "CORE_RPC": {
             "USERNAME": "sop-energy",
-            "PASSWORD": "$${bitcoind-signet-rpc-psk}",
+            "PASSWORD": "${bitcoind-signet-rpc-psk}",
             "PORT": 38332
           },
           "ELECTRUM": {
@@ -87,7 +87,7 @@ in
             "PORT": 3306,
             "DATABASE": "sopenergy",
             "USERNAME": "sopenergy",
-            "PASSWORD": "$${op-energy-db-psk-signet}"
+            "PASSWORD": "${op-energy-db-psk-signet}"
           },
           "STATISTICS": {
             "ENABLED": true,
@@ -137,7 +137,7 @@ in
     rpc.users = {
       sop-energy = {
         name = "sop-energy";
-        passwordHMAC = "$${bitcoind-signet-rpc-pskhmac}";
+        passwordHMAC = "${bitcoind-signet-rpc-pskhmac}";
       };
     };
   };
