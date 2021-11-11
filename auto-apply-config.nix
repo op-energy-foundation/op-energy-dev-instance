@@ -6,10 +6,7 @@ let
 
 
     cd /etc/nixos
-    git status | grep modified > /dev/null && {
-      echo "some uncommited changes had been detected, removing"
-      git reset --hard # remove local changes to not to conflict
-    } || true
+    git reset --hard --recurse-submodules | true # remove local changes to not to conflict
     git pull | grep "Already up to date." > /dev/null || {
       git submodule init || true # in case of first run
       git submodule update --remote # don't force the support to update every repo
