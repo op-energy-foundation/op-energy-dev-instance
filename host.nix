@@ -48,7 +48,6 @@ in
   #          "HOST": "127.0.0.1",
   #          "PORT": 3306,
   #          "DATABASE": "topenergy",
-  #          "ACCOUNT_DATABASE": "topenergyacc",
   #          "USERNAME": "topenergy",
   #          "PASSWORD": "${op-energy-db-psk-testnet}"
   #        },
@@ -59,13 +58,9 @@ in
   #      }
   #    '';
   #  };
-    signet =
-      let
-        db = "sopenergy";
-      in {
+    signet = {
       db_user = "sopenergy";
-      db_name = db;
-      account_db_name = "${db}acc";
+      db_name = "sopenergy";
       db_psk = op-energy-db-psk-signet;
       config = ''
         {
@@ -90,8 +85,7 @@ in
             "ENABLED": true,
             "HOST": "127.0.0.1",
             "PORT": 3306,
-            "DATABASE": "${db}",
-            "ACCOUNT_DATABASE": "${db}acc",
+            "DATABASE": "sopenergy",
             "USERNAME": "sopenergy",
             "PASSWORD": "${op-energy-db-psk-signet}"
           },
