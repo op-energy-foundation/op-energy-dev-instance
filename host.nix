@@ -6,7 +6,6 @@ let
   # TODO: refactor to autogenerate HMAC from the password above
   bitcoind-signet-rpc-pskhmac = builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt");
   op-energy-db-psk-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-signet.txt");
-  op-energy-db-salt-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-signet.txt");
 in
 {
   imports = [
@@ -94,8 +93,7 @@ in
             "DATABASE": "${db}",
             "ACCOUNT_DATABASE": "${db}acc",
             "USERNAME": "sopenergy",
-            "PASSWORD": "${op-energy-db-psk-signet}",
-            "SECRET_SALT": "${op-energy-db-salt-signet}"
+            "PASSWORD": "${op-energy-db-psk-signet}"
           },
           "STATISTICS": {
             "ENABLED": true,
