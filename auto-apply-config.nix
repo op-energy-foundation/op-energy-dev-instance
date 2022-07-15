@@ -7,7 +7,7 @@ let
 
     cd /etc/nixos
     git reset --hard --recurse-submodules || true # remove local changes to not to conflict
-    git pull > /dev/null
+    git pull > /dev/null || echo "there are some issues to pull from repo, but it is ok for development version, ignoring error"
     git submodule init || true # in case of first run
     git submodule update --remote # don't force the support to update every repo
     /run/current-system/sw/bin/systemctl start nixos-upgrade --no-block
