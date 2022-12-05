@@ -7,6 +7,9 @@ let
   bitcoind-signet-rpc-pskhmac = builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt");
   op-energy-db-psk-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-signet.txt");
   op-energy-db-salt-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-signet.txt");
+  bitcoind-mainnet-rpc-psk = builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt");
+  op-energy-db-psk-mainnet = builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt");
+  op-energy-db-salt-mainnet = builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt");
 in
 {
   imports = [
@@ -104,6 +107,49 @@ in
         }
       '';
     };
+    mainnet =
+      let
+        db = "openergy";
+      in {
+      db_user = "openergy";
+      db_name = db;
+      account_db_name = "${db}acc";
+      db_psk = op-energy-db-psk-mainnet;
+      config = ''
+        {
+          "MEMPOOL": {
+            "NETWORK": "mainnet",
+            "BACKEND": "electrum",
+            "HTTP_PORT": 8999,
+            "API_URL_PREFIX": "/api/v1/",
+            "POLL_RATE_MS": 2000
+          },
+          "CORE_RPC": {
+            "USERNAME": "op-energy",
+            "PASSWORD": "${bitcoind-mainnet-rpc-psk}"
+          },
+          "ELECTRUM": {
+            "HOST": "127.0.0.1",
+            "PORT": 50001,
+            "TLS_ENABLED": false
+          },
+          "DATABASE": {
+            "ENABLED": true,
+            "HOST": "127.0.0.1",
+            "PORT": 3306,
+            "DATABASE": "${db}",
+            "ACCOUNT_DATABASE": "${db}acc",
+            "USERNAME": "openergy",
+            "PASSWORD": "${op-energy-db-psk-mainnet}",
+            "SECRET_SALT": "${op-energy-db-salt-mainnet}"
+          },
+          "STATISTICS": {
+            "ENABLED": true,
+            "TX_PER_SECOND_SAMPLE_PERIOD": 150
+          }
+        }
+      '';
+    };
   };
   # enable op-energy-frontend service
   services.op-energy-frontend = {
@@ -167,6 +213,30 @@ in
     22
     80
   ];
+  systemd.services = {
+    ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
+      wantedBy = [ "multi-user.target" ];
+      before = [ "op-energy-backend-mainnet.service" ];
+      after = [
+        "network-online.target"
+      ];
+      requires = [
+        "network-online.target"
+      ];
+      serviceConfig = {
+        Type = "simple";
+        Restart = "always"; # we want to keep service always running
+        StartLimitIntervalSec = 0;
+        StartLimitBurst = 0;
+      };
+      path = with pkgs; [
+        openssh
+      ];
+      script = ''
+        ssh proxy@exchange.op-energy.info -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -n "while true; do sleep 10s; done"
+      '';
+    };
+  };
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = true;
