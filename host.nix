@@ -66,10 +66,12 @@ in
     signet =
       let
         db = "sopenergy";
+        block_spans_db_name = "${db}_block_spans";
       in {
       db_user = "sopenergy";
       db_name = db;
       account_db_name = "${db}acc";
+      block_spans_db_name = block_spans_db_name;
       db_psk = op-energy-db-psk-signet;
       config = ''
         {
@@ -96,6 +98,7 @@ in
             "PORT": 3306,
             "DATABASE": "${db}",
             "ACCOUNT_DATABASE": "${db}acc",
+            "OP_ENERGY_BLOCKCHAIN_DATABASE": "${block_spans_db_name}",
             "USERNAME": "sopenergy",
             "PASSWORD": "${op-energy-db-psk-signet}",
             "SECRET_SALT": "${op-energy-db-salt-signet}"
@@ -110,10 +113,12 @@ in
     mainnet =
       let
         db = "openergy";
+        block_spans_db_name = "${db}_block_spans";
       in {
       db_user = "openergy";
       db_name = db;
       account_db_name = "${db}acc";
+      block_spans_db_name = block_spans_db_name;
       db_psk = op-energy-db-psk-mainnet;
       config = ''
         {
@@ -139,6 +144,7 @@ in
             "PORT": 3306,
             "DATABASE": "${db}",
             "ACCOUNT_DATABASE": "${db}acc",
+            "OP_ENERGY_BLOCKCHAIN_DATABASE": "${block_spans_db_name}",
             "USERNAME": "openergy",
             "PASSWORD": "${op-energy-db-psk-mainnet}",
             "SECRET_SALT": "${op-energy-db-salt-mainnet}"
