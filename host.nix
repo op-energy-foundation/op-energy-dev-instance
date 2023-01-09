@@ -163,18 +163,6 @@ in
     signet_enabled = true;
   };
 
-  # enable electrs service
-  services.electrs = {
-    signet = { # signet instance
-      db_dir = "/mnt/electrs-signet";
-      cookie_file = "/mnt/bitcoind-signet/signet/.cookie";
-      blocks_dir = "/mnt/bitcoind-signet/signet/blocks";
-      network = "signet";
-      rpc_listen = "127.0.0.1:60601";
-      daemon_rpc_addr = "127.0.0.1:38332";
-    };
-  };
-
   # bitcoind signet instance
   services.bitcoind.signet = {
     enable = true;
