@@ -15,8 +15,6 @@ in
   imports = [
     # module, which enables automatic update of the configuration from git
     ./auto-apply-config.nix
-    # custom module for already existing electrs derivation
-    ./overlays/electrs-overlay/module.nix
     # custom module for op-energy
     ./overlays/op-energy/nix/module.nix
   ];
@@ -32,7 +30,7 @@ in
   #      {
   #        "MEMPOOL": {
   #          "NETWORK": "testnet",
-  #          "BACKEND": "electrum",
+  #          "BACKEND": "none",
   #          "HTTP_PORT": 8997,
   #          "API_URL_PREFIX": "/api/v1/",
   #          "POLL_RATE_MS": 2000
@@ -41,11 +39,6 @@ in
   #          "USERNAME": "top-energy",
   #          "PASSWORD": "${bitcoind-testnet-rpc-psk}",
   #          "PORT": 18332
-  #        },
-  #        "ELECTRUM": {
-  #          "HOST": "127.0.0.1",
-  #          "PORT": 60001,
-  #          "TLS_ENABLED": false
   #        },
   #        "DATABASE": {
   #          "ENABLED": true,
@@ -77,7 +70,7 @@ in
         {
           "MEMPOOL": {
             "NETWORK": "signet",
-            "BACKEND": "electrum",
+            "BACKEND": "none",
             "HTTP_PORT": 8995,
             "API_URL_PREFIX": "/api/v1/",
             "POLL_RATE_MS": 2000
@@ -86,11 +79,6 @@ in
             "USERNAME": "sop-energy",
             "PASSWORD": "${bitcoind-signet-rpc-psk}",
             "PORT": 38332
-          },
-          "ELECTRUM": {
-            "HOST": "127.0.0.1",
-            "PORT": 60601,
-            "TLS_ENABLED": false
           },
           "DATABASE": {
             "ENABLED": true,
@@ -124,7 +112,7 @@ in
         {
           "MEMPOOL": {
             "NETWORK": "mainnet",
-            "BACKEND": "electrum",
+            "BACKEND": "none",
             "HTTP_PORT": 8999,
             "API_URL_PREFIX": "/api/v1/",
             "POLL_RATE_MS": 2000
@@ -132,11 +120,6 @@ in
           "CORE_RPC": {
             "USERNAME": "op-energy",
             "PASSWORD": "${bitcoind-mainnet-rpc-psk}"
-          },
-          "ELECTRUM": {
-            "HOST": "127.0.0.1",
-            "PORT": 50001,
-            "TLS_ENABLED": false
           },
           "DATABASE": {
             "ENABLED": true,
