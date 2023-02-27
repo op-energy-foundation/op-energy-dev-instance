@@ -1,15 +1,18 @@
-{pkgs, lib, ...}:
-let
+{ pkgs, lib
   # import psk from out-of-git file
   # TODO: switch to secrets-manager and change to make it more secure
-  bitcoind-signet-rpc-psk = builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt");
+, bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
   # TODO: refactor to autogenerate HMAC from the password above
-  bitcoind-signet-rpc-pskhmac = builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt");
-  op-energy-db-psk-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-signet.txt");
-  op-energy-db-salt-signet = builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-signet.txt");
-  bitcoind-mainnet-rpc-psk = builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt");
-  op-energy-db-psk-mainnet = builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt");
-  op-energy-db-salt-mainnet = builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt");
+, bitcoind-signet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt")
+, op-energy-db-psk-signet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-signet.txt")
+, op-energy-db-salt-signet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-signet.txt")
+, bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
+, op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
+, op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
+, ...
+}:
+
+let
 in
 {
   imports = [
