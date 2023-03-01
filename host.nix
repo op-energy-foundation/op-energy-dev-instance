@@ -9,6 +9,7 @@
 , bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
 , op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
+, mainnet_node_ssh_tunnel ? true # by default we want ssh tunnel to main node, but this is useless for github actions as they are using only signet node
 , ...
 }:
 
@@ -103,6 +104,7 @@ in
         }
       '';
     };
+  } // lib.mkIf mainnet_node_ssh_tunnel {
     mainnet =
       let
         db = "openergy";
@@ -195,7 +197,7 @@ in
     22
     80
   ];
-  systemd.services = {
+  systemd.services = lib.mkIf mainnet_node_ssh_tunnel {
     ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
       wantedBy = [ "multi-user.target" ];
       before = [ "op-energy-backend-mainnet.service" ];
