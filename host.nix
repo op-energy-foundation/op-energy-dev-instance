@@ -1,4 +1,4 @@
-{ pkgs, lib
+args@{ pkgs, lib
   # import psk from out-of-git file
   # TODO: switch to secrets-manager and change to make it more secure
 , bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
@@ -14,13 +14,23 @@
 }:
 
 let
+  sourceWithGit = pkgs.copyPathToStore ./overlays/op-energy;
+  GIT_COMMIT_HASH = builtins.readFile ( # if git commit is empty, then try to get it from git
+    pkgs.runCommand "get-rev1" {
+      nativeBuildInputs = [ pkgs.git ];
+    } ''
+      HASH=$(GIT_DIR=${sourceWithGit}/.git git rev-parse --short HEAD | tr -d '\n' || echo 'NOT A GIT REPO')
+      echo $HASH > $out
+    ''
+  );
+
 in
 {
   imports = [
     # module, which enables automatic update of the configuration from git
     ./auto-apply-config.nix
     # custom module for op-energy
-    ./overlays/op-energy/nix/module.nix
+    (./overlays/op-energy/nix/module.nix args // { GIT_COMMIT_HASH = GIT_COMMIT_HASH; })
   ];
   system.stateVersion = "22.05";
   # op-energy part
