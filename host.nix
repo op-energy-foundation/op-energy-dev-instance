@@ -1,4 +1,6 @@
-args@{ pkgs, lib
+env@{
+  GIT_COMMIT_HASH ? ""
+,  OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
   # import psk from out-of-git file
   # TODO: switch to secrets-manager and change to make it more secure
 , bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
@@ -10,27 +12,30 @@ args@{ pkgs, lib
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
 , op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
 , mainnet_node_ssh_tunnel ? true # by default we want ssh tunnel to main node, but this is useless for github actions as they are using only signet node
-, ...
 }:
+args@{ pkgs, lib, ...}:
 
 let
-  sourceWithGit = pkgs.copyPathToStore ./overlays/op-energy;
-  GIT_COMMIT_HASH = builtins.readFile ( # if git commit is empty, then try to get it from git
-    pkgs.runCommand "get-rev1" {
-      nativeBuildInputs = [ pkgs.git ];
-    } ''
-      HASH=$(GIT_DIR=${sourceWithGit}/.git git rev-parse --short HEAD | tr -d '\n' || echo 'NOT A GIT REPO')
-      echo $HASH > $out
-    ''
-  );
-
+  sourceWithGit = pkgs.copyPathToStore OP_ENERGY_REPO_LOCATION;
+  GIT_COMMIT_HASH = if builtins.hasAttr "GIT_COMMIT_HASH" env
+    then env.GIT_COMMIT_HASH
+    else builtins.readFile ( # if git commit is empty, then try to get it from git
+      pkgs.runCommand "get-rev1" {
+        nativeBuildInputs = [ pkgs.git ];
+      } ''
+        echo "OP_ENERGY_REPO_LOCATION = ${OP_ENERGY_REPO_LOCATION}"
+        HASH=$(cat ${sourceWithGit}/HEAD | cut -c 1-8 | tr -d '\n' || printf 'NOT A GIT REPO')
+        printf $HASH > $out
+      ''
+    );
+  opEnergyModule = import ./overlays/op-energy/nix/module.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH; };
 in
 {
   imports = [
     # module, which enables automatic update of the configuration from git
     ./auto-apply-config.nix
     # custom module for op-energy
-    (./overlays/op-energy/nix/module.nix args // { GIT_COMMIT_HASH = GIT_COMMIT_HASH; })
+    opEnergyModule
   ];
   system.stateVersion = "22.05";
   # op-energy part
@@ -114,7 +119,9 @@ in
         }
       '';
     };
-  } // lib.mkIf mainnet_node_ssh_tunnel {
+  } // (if !mainnet_node_ssh_tunnel
+    then {}
+    else {
     mainnet =
       let
         db = "openergy";
@@ -156,7 +163,7 @@ in
         }
       '';
     };
-  };
+  });
   # enable op-energy-frontend service
   services.op-energy-frontend = {
     enable = true;
@@ -207,7 +214,9 @@ in
     22
     80
   ];
-  systemd.services = lib.mkIf mainnet_node_ssh_tunnel {
+  systemd.services = if !mainnet_node_ssh_tunnel
+    then {}
+    else {
     ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
       wantedBy = [ "multi-user.target" ];
       before = [ "op-energy-backend-mainnet.service" ];
