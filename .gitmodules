@@ -1,4 +1,4 @@
 [submodule "overlays/op-energy"]
 	path = overlays/op-energy
 	url = https://github.com/dambaev/op-energy.git
-	branch = 300-implement-github-action-to-deploy-to-digital-ocean-when-pr-is-merged
+	branch = backend-refactor
