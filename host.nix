@@ -90,7 +90,7 @@ in
           "DB_USER": "${db}",
           "DB_NAME": "${db}",
           "DB_PASSWORD": "${op-energy-db-psk-signet}",
-          "SECRET_SALT": "${op-energy-db-salt-signet}"
+          "SECRET_SALT": "${op-energy-db-salt-signet}",
           "API_HTTP_PORT": 8995,
           "BTC_URL": "http://127.0.0.1:38332",
           "BTC_USER": "sop-energy",
@@ -118,7 +118,7 @@ in
           "DB_USER": "${db}",
           "DB_NAME": "${db}",
           "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
-          "SECRET_SALT": "${op-energy-db-salt-mainnet}"
+          "SECRET_SALT": "${op-energy-db-salt-mainnet}",
           "API_HTTP_PORT": 8999,
           "BTC_URL": "http://127.0.0.1:8332",
           "BTC_USER": "op-energy",
