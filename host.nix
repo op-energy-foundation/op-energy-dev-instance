@@ -78,7 +78,6 @@ in
     signet =
       let
         db = "sopenergy";
-        block_spans_db_name = "${db}_block_spans";
       in {
       db_user = "sopenergy";
       db_name = db;
@@ -107,7 +106,6 @@ in
     mainnet =
       let
         db = "openergy";
-        block_spans_db_name = "${db}_block_spans";
       in {
       db_user = "openergy";
       db_name = db;
