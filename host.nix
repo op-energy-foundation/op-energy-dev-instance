@@ -96,6 +96,7 @@ in
           "BTC_USER": "sop-energy",
           "BTC_PASSWORD": "${bitcoind-signet-rpc-psk}",
           "BTC_POLL_RATE_SECS": 10,
+          "PROMETHEUS_PORT": 7995,
           "SCHEDULER_POLL_RATE_SECS": 10
         }
       '';
@@ -124,6 +125,7 @@ in
           "BTC_USER": "op-energy",
           "BTC_PASSWORD": "${bitcoind-mainnet-rpc-psk}",
           "BTC_POLL_RATE_SECS": 10,
+          "PROMETHEUS_PORT": 7999,
           "SCHEDULER_POLL_RATE_SECS": 10
         }
       '';
