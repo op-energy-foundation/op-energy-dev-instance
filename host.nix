@@ -1,6 +1,6 @@
 env@{
   GIT_COMMIT_HASH ? ""
-,  OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
+,  OP_ENERGY_FRONTEND_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/ope-blockspan-service
   # import psk from out-of-git file
   # TODO: switch to secrets-manager and change to make it more secure
 , bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
@@ -16,125 +16,126 @@ env@{
 args@{ pkgs, lib, ...}:
 
 let
-  sourceWithGit = pkgs.copyPathToStore OP_ENERGY_REPO_LOCATION;
-  GIT_COMMIT_HASH = if builtins.hasAttr "GIT_COMMIT_HASH" env
-    then env.GIT_COMMIT_HASH
+  frontendSourceWithGit = pkgs.copyPathToStore OP_ENERGY_FRONTEND_REPO_LOCATION;
+  FRONTEND_GIT_COMMIT_HASH = if builtins.hasAttr "FRONTEND_GIT_COMMIT_HASH" env
+    then env.FRONTEND_GIT_COMMIT_HASH
     else builtins.readFile ( # if git commit is empty, then try to get it from git
       pkgs.runCommand "get-rev1" {
         nativeBuildInputs = [ pkgs.git ];
       } ''
-        echo "OP_ENERGY_REPO_LOCATION = ${OP_ENERGY_REPO_LOCATION}"
-        HASH=$(cat ${sourceWithGit}/HEAD | cut -c 1-8 | tr -d '\n' || printf 'NOT A GIT REPO')
+        echo "OP_ENERGY_FRONTEND_REPO_LOCATION = ${OP_ENERGY_FRONTEND_REPO_LOCATION}"
+        HASH=$(cat ${frontendSourceWithGit}/HEAD | cut -c 1-8 | tr -d '\n' || printf 'NOT A GIT REPO')
         printf $HASH > $out
       ''
     );
-  opEnergyModule = import ./overlays/op-energy/nix/module.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH; };
+  opEnergyFrontendModule = import ./overlays/ope-blockspan-service/frontend/module-frontend.nix { GIT_COMMIT_HASH = FRONTEND_GIT_COMMIT_HASH; };
 in
 {
   imports = [
     # module, which enables automatic update of the configuration from git
     ./auto-apply-config.nix
     # custom module for op-energy
-    opEnergyModule
+    opEnergyFrontendModule
   ];
   system.stateVersion = "22.05";
   # op-energy part
-  services.op-energy-backend = {
-  # keeping testnet commented to have testnet ports in quick access
-  #  testnet = {
-  #    db_user = "topenergy";
-  #    db_name = "topenergy";
-  #    db_psk = op-energy-db-psk-testnet;
-  #    config = ''
-  #      {
-  #        "MEMPOOL": {
-  #          "NETWORK": "testnet",
-  #          "BACKEND": "none",
-  #          "HTTP_PORT": 8997,
-  #          "API_URL_PREFIX": "/api/v1/",
-  #          "POLL_RATE_MS": 2000
-  #        },
-  #        "CORE_RPC": {
-  #          "USERNAME": "top-energy",
-  #          "PASSWORD": "${bitcoind-testnet-rpc-psk}",
-  #          "PORT": 18332
-  #        },
-  #        "DATABASE": {
-  #          "ENABLED": true,
-  #          "HOST": "127.0.0.1",
-  #          "PORT": 3306,
-  #          "DATABASE": "topenergy",
-  #          "ACCOUNT_DATABASE": "topenergyacc",
-  #          "USERNAME": "topenergy",
-  #          "PASSWORD": "${op-energy-db-psk-testnet}"
-  #        },
-  #        "STATISTICS": {
-  #          "ENABLED": true,
-  #          "TX_PER_SECOND_SAMPLE_PERIOD": 150
-  #        }
-  #      }
-  #    '';
-  #  };
-    signet =
-      let
-        db = "sopenergy";
-      in {
-      db_user = "sopenergy";
-      db_name = db;
-      account_db_name = "${db}acc";
-      db_psk = op-energy-db-psk-signet;
-      config = ''
-        {
-          "DB_PORT": 5432,
-          "DB_HOST": "127.0.0.1",
-          "DB_USER": "${db}",
-          "DB_NAME": "${db}",
-          "DB_PASSWORD": "${op-energy-db-psk-signet}",
-          "SECRET_SALT": "${op-energy-db-salt-signet}",
-          "API_HTTP_PORT": 8995,
-          "BTC_URL": "http://127.0.0.1:38332",
-          "BTC_USER": "sop-energy",
-          "BTC_PASSWORD": "${bitcoind-signet-rpc-psk}",
-          "BTC_POLL_RATE_SECS": 10,
-          "PROMETHEUS_PORT": 7995,
-          "SCHEDULER_POLL_RATE_SECS": 10
-        }
-      '';
-    };
-  } // (if !mainnet_node_ssh_tunnel
-    then {}
-    else {
-    mainnet =
-      let
-        db = "openergy";
-      in {
-      db_user = "openergy";
-      db_name = db;
-      account_db_name = "${db}acc";
-      db_psk = op-energy-db-psk-mainnet;
-      config = ''
-        {
-          "DB_PORT": 5432,
-          "DB_HOST": "127.0.0.1",
-          "DB_USER": "${db}",
-          "DB_NAME": "${db}",
-          "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
-          "SECRET_SALT": "${op-energy-db-salt-mainnet}",
-          "API_HTTP_PORT": 8999,
-          "BTC_URL": "http://127.0.0.1:8332",
-          "BTC_USER": "op-energy",
-          "BTC_PASSWORD": "${bitcoind-mainnet-rpc-psk}",
-          "BTC_POLL_RATE_SECS": 10,
-          "PROMETHEUS_PORT": 7999,
-          "SCHEDULER_POLL_RATE_SECS": 10
-        }
-      '';
-    };
-  });
+#  services.op-energy-backend = {
+#  # keeping testnet commented to have testnet ports in quick access
+#  #  testnet = {
+#  #    db_user = "topenergy";
+#  #    db_name = "topenergy";
+#  #    db_psk = op-energy-db-psk-testnet;
+#  #    config = ''
+#  #      {
+#  #        "MEMPOOL": {
+#  #          "NETWORK": "testnet",
+#  #          "BACKEND": "none",
+#  #          "HTTP_PORT": 8997,
+#  #          "API_URL_PREFIX": "/api/v1/",
+#  #          "POLL_RATE_MS": 2000
+#  #        },
+#  #        "CORE_RPC": {
+#  #          "USERNAME": "top-energy",
+#  #          "PASSWORD": "${bitcoind-testnet-rpc-psk}",
+#  #          "PORT": 18332
+#  #        },
+#  #        "DATABASE": {
+#  #          "ENABLED": true,
+#  #          "HOST": "127.0.0.1",
+#  #          "PORT": 3306,
+#  #          "DATABASE": "topenergy",
+#  #          "ACCOUNT_DATABASE": "topenergyacc",
+#  #          "USERNAME": "topenergy",
+#  #          "PASSWORD": "${op-energy-db-psk-testnet}"
+#  #        },
+#  #        "STATISTICS": {
+#  #          "ENABLED": true,
+#  #          "TX_PER_SECOND_SAMPLE_PERIOD": 150
+#  #        }
+#  #      }
+#  #    '';
+#  #  };
+#    signet =
+#      let
+#        db = "sopenergy";
+#      in {
+#      db_user = "sopenergy";
+#      db_name = db;
+#      account_db_name = "${db}acc";
+#      db_psk = op-energy-db-psk-signet;
+#      config = ''
+#        {
+#          "DB_PORT": 5432,
+#          "DB_HOST": "127.0.0.1",
+#          "DB_USER": "${db}",
+#          "DB_NAME": "${db}",
+#          "DB_PASSWORD": "${op-energy-db-psk-signet}",
+#          "SECRET_SALT": "${op-energy-db-salt-signet}",
+#          "API_HTTP_PORT": 8995,
+#          "BTC_URL": "http://127.0.0.1:38332",
+#          "BTC_USER": "sop-energy",
+#          "BTC_PASSWORD": "${bitcoind-signet-rpc-psk}",
+#          "BTC_POLL_RATE_SECS": 10,
+#          "PROMETHEUS_PORT": 7995,
+#          "SCHEDULER_POLL_RATE_SECS": 10
+#        }
+#      '';
+#    };
+#  } // (if !mainnet_node_ssh_tunnel
+#    then {}
+#    else {
+#    mainnet =
+#      let
+#        db = "openergy";
+#      in {
+#      db_user = "openergy";
+#      db_name = db;
+#      account_db_name = "${db}acc";
+#      db_psk = op-energy-db-psk-mainnet;
+#      config = ''
+#        {
+#          "DB_PORT": 5432,
+#          "DB_HOST": "127.0.0.1",
+#          "DB_USER": "${db}",
+#          "DB_NAME": "${db}",
+#          "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
+#          "SECRET_SALT": "${op-energy-db-salt-mainnet}",
+#          "API_HTTP_PORT": 8999,
+#          "BTC_URL": "http://127.0.0.1:8332",
+#          "BTC_USER": "op-energy",
+#          "BTC_PASSWORD": "${bitcoind-mainnet-rpc-psk}",
+#          "BTC_POLL_RATE_SECS": 10,
+#          "PROMETHEUS_PORT": 7999,
+#          "SCHEDULER_POLL_RATE_SECS": 10
+#        }
+#      '';
+#    };
+#  });
   # enable op-energy-frontend service
   services.op-energy-frontend = {
     enable = true;
-    signet_enabled = true;
+#    signet_enabled = true;
+    mainnet_api_host = "http://exchange.op-energy.info";
   };
 
   # bitcoind signet instance
