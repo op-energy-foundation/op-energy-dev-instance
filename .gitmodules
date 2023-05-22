@@ -1,7 +1,3 @@
-[submodule "overlays/op-energy"]
-	path = overlays/op-energy
-	url = https://github.com/dambaev/op-energy.git
-	branch = backend-refactor
 [submodule "overlays/ope-blockspan-service"]
 	path = overlays/ope-blockspan-service
 	url = ssh://git@github.com/girish-velas/ope-blockspan-service.git
