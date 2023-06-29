@@ -12,6 +12,7 @@ env@{
 , bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
 , op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
+, op-energy-account-token-encryption-key ? builtins.readFile ( "/etc/nixos/private/op-energy-account-token-encryption-key.txt")
 , mainnet_node_ssh_tunnel ? true # by default we want ssh tunnel to main node, but this is useless for github actions as they are using only signet node
 }:
 args@{ pkgs, lib, ...}:
@@ -29,8 +30,8 @@ let
         printf $HASH > $out
       ''
     );
-  opEnergyFrontendModule = import ./overlays/ope-blockspan-service/frontend/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
-  opEnergyBackendModule = import ./overlays/ope-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
+  opEnergyFrontendModule = import ./overlays/op-energy/ope-blockspan-service/frontend/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
+  opEnergyBackendModule = import ./overlays/op-energy/ope-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
 in
 {
@@ -87,6 +88,7 @@ in
       db_user = "sopenergy";
       db_name = db;
       db_psk = op-energy-db-psk-signet;
+      account_db_name = "${db}acc";
       config = ''
         {
           "DB_PORT": 5432,
@@ -115,6 +117,7 @@ in
       db_user = "openergy";
       db_name = db;
       db_psk = op-energy-db-psk-mainnet;
+      account_db_name = "${db}acc";
       config = ''
         {
           "DB_PORT": 5432,
@@ -152,12 +155,9 @@ in
         "DB_NAME": "openergyacc",
         "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
         "SECRET_SALT": "${op-energy-db-salt-mainnet}",
-        "API_HTTP_PORT": 8999,
-        "BTC_URL": "http://127.0.0.1:8332",
-        "BTC_USER": "op-energy",
-        "BTC_PASSWORD": "${bitcoind-mainnet-rpc-psk}",
-        "BTC_POLL_RATE_SECS": 10,
-        "PROMETHEUS_PORT": 7999,
+        "ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY": "${op-energy-account-token-encryption-key}",
+        "API_HTTP_PORT": 8899,
+        "PROMETHEUS_PORT": 7899,
         "SCHEDULER_POLL_RATE_SECS": 10
       }
     '';

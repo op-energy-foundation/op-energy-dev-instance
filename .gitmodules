@@ -1,0 +1,3 @@
+[submodule "overlays/op-energy"]
+	path = overlays/op-energy
+	url = ssh://git@github.com/op-energy-foundation/op-energy
