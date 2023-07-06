@@ -18,10 +18,13 @@ env@{
 args@{ pkgs, lib, ...}:
 
 let
-  sourceWithGit = pkgs.copyPathToStore OP_ENERGY_REPO_LOCATION;
   GIT_COMMIT_HASH = REPO_LOCATION: if builtins.hasAttr "GIT_COMMIT_HASH" env
     then env.GIT_COMMIT_HASH
-    else builtins.readFile ( # if git commit is empty, then try to get it from git
+    else
+      let
+        sourceWithGit = pkgs.copyPathToStore REPO_LOCATION;
+      in
+      builtins.readFile ( # if git commit is empty, then try to get it from git
       pkgs.runCommand "get-rev1" {
         nativeBuildInputs = [ pkgs.git ];
       } ''
