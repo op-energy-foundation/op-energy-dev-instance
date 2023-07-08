@@ -12,7 +12,7 @@ let
     git submodule update --remote # don't force the support to update every repo
     mkdir -p /var/lib/nixos-apply
     NEW_HASH=$(git log -n 1 | head -n 1 | awk '{print $2}')
-    NEW_SUBMODULES_STATE=$(git submodule status)
+    NEW_SUBMODULES_STATE=$(git submodule status | tr -d '\n')
     LAST_HASH=$(cat /var/lib/nixos-apply/hash || echo "")
     LAST_HASH_FAILED=$(cat /var/lib/nixos-apply/failed || echo 0)
     LAST_SUBMODULES_STATE=$(cat /var/lib/nixos-apply/submodules || echo "")
