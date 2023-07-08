@@ -22,6 +22,8 @@ let
     fi
     if [ "$NEW_SUBMODULES_STATE" != "$LAST_SUBMODULES_STATE" ]; then
       echo "submodules state is different"
+      echo "NEW_SUBMODULES_STATE= \"$NEW_SUBMODULES_STATE\""
+      echo "LAST_SUBMODULES_STATE= \"$LAST_SUBMODULES_STATE\""
     fi
     if [ "$LAST_HASH_FAILED" -gt "0" ] && [ "$LAST_HASH_FAILED" -lt "5" ]; then
       echo "failed builds haven't exceeded 5 times"
