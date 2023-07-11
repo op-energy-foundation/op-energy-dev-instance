@@ -8,8 +8,8 @@ let
     cd /etc/nixos
     git reset --hard > /dev/null # remove local changes to not to conflict
     git pull --rebase > /dev/null
-    git submodule init --recursive || true # in case of first run
-    git submodule update --remote --recursive # don't force the support to update every repo
+    git submodule init || true # in case of first run
+    git submodule update --init --remote --recursive # don't force the support to update every repo
     mkdir -p /var/lib/nixos-apply
     NEW_HASH=$(git log -n 1 | head -n 1 | awk '{print $2}')
     NEW_SUBMODULES_STATE=$(git submodule status --recursive | tr -d '\n')
