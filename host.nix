@@ -1,6 +1,6 @@
 env@{
   GIT_COMMIT_HASH ? ""
-, OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy/ope-blockspan-service
+, OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy/modules/ope-blockspan-service
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
   # import psk from out-of-git file
   # TODO: switch to secrets-manager and change to make it more secure
