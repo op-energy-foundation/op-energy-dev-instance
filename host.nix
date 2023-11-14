@@ -159,7 +159,7 @@ in
         "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
         "SECRET_SALT": "${op-energy-db-salt-mainnet}",
         "ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY": "${op-energy-account-token-encryption-key}",
-        "API_HTTP_PORT": 8999,
+        "API_HTTP_PORT": 8899,
         "PROMETHEUS_PORT": 7899,
         "SCHEDULER_POLL_RATE_SECS": 10
       }
