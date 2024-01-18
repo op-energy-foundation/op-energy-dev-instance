@@ -161,6 +161,7 @@ in
         "ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY": "${op-energy-account-token-encryption-key}",
         "API_HTTP_PORT": 8899,
         "PROMETHEUS_PORT": 7899,
+        "LOG_LEVEL_MIN": "Debug",
         "SCHEDULER_POLL_RATE_SECS": 10
       }
     '';
