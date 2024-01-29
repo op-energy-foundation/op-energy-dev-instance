@@ -211,6 +211,7 @@ in
   networking.firewall.allowedTCPPorts = [
     22
     80
+    443 # ssl backed service
   ];
   systemd.services = if !mainnet_node_ssh_tunnel
     then {}
