@@ -1,8 +1,12 @@
+env:
 args@{ pkgs, lib, ...}:
 
+let
+  local_settings_development = import ./local_settings_development.nix env;
+in
 {
   imports = [
-    ./local_settings_development.nix # this instance is development
+    local_settings_development # this instance is development
   ];
 
   users.users.nginx.extraGroups = [ "acme" ];
