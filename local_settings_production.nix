@@ -10,6 +10,10 @@ args@{ pkgs, lib, ...}:
 let
 in
 {
+  imports = [
+    # module, which enables automatic update of the configuration from git
+    ./auto-apply-config.nix
+  ];
   system.stateVersion = "22.05";
 
   # bitcoind mainnet instance

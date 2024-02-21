@@ -34,8 +34,6 @@ let
 in
 {
   imports = [
-    # module, which enables automatic update of the configuration from git
-    ./auto-apply-config.nix
     # custom module for op-energy
     opEnergyFrontendModule
     opEnergyBackendModule
