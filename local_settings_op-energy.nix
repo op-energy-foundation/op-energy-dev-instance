@@ -1,5 +1,5 @@
-env@{
-, tg-alerts-chat-id ? builtins.readFile ("/etc/nixos/private/op-energy-tg-alerts-chat-id")
+env@
+{ tg-alerts-chat-id ? builtins.readFile ("/etc/nixos/private/op-energy-tg-alerts-chat-id")
 , tg-alerts-bot-token ? builtins.readFile ("/etc/nixos/private/op-energy-tg-alerts-bot-token")
 , mainnet_volume ? builtins.readFile ("/etc/nixos/private/mainnet-volume")
 ...
