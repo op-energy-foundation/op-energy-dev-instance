@@ -3,10 +3,12 @@ args@{ pkgs, lib, ...}:
 
 let
   local_settings_development = import ./local_settings_development.nix env;
+  internal_blocktime_api_port = import ./internal_blocktime_api_port.nix;
 in
 {
   imports = [
     local_settings_development # this instance is development
+    (import ./scheduled_strike_creation_module.nix { internal_blocktime_api_port = internal_blocktime_api_port; })
   ];
 
   users.users.nginx.extraGroups = [ "acme" ];
