@@ -21,30 +21,14 @@ args@{ pkgs, lib, ...}:
     80
   ];
 
-  systemd.services = {
-    ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
-      wantedBy = [ "multi-user.target" ];
-      before = [ "op-energy-backend-mainnet.service" ];
-      after = [
-        "network-online.target"
-      ];
-      requires = [
-        "network-online.target"
-      ];
-      serviceConfig = {
-        Type = "simple";
-        Restart = "always"; # we want to keep service always running
-        StartLimitIntervalSec = 0;
-        StartLimitBurst = 0;
-      };
-      path = with pkgs; [
-        openssh
-      ];
-      script = ''
-        ssh proxy@exchange.op-energy.info -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -n "while true; do sleep 10s; done"
-      '';
-    };
+  # use zero tier instead of ssh vpn, which is slow
+  services.zerotierone = {
+    enable = true;
+    joinNetworks = [
+      "41d49af6c2442cb2" # administrated by dambaev
+    ];
   };
+  nixpkgs.config.allowUnfree = true; # for zerotier
 
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
