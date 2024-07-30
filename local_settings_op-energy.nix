@@ -170,4 +170,12 @@ in
     };
   };
 
+  # use zero tier instead of ssh vpn, which is slow
+  services.zerotierone = {
+    enable = true;
+    joinNetworks = [
+      "41d49af6c2442cb2" # administrated by dambaev
+    ];
+  };
+  nixpkgs.config.allowUnfree = true; # for zerotier
 }
