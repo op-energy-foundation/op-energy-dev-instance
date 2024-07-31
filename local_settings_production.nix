@@ -25,7 +25,6 @@ in
       server=1
       listen=1
       discover=1
-      rpcallowip=127.0.0.1
     '';
     rpc.users = {
       op-energy = {
