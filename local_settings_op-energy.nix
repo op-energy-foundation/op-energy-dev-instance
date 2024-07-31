@@ -181,6 +181,7 @@ in
   networking.firewall.extraCommands = ''
     iptables -t filter -A nixos-fw -m conntrack --ctstate NEW -i ztw4ln5wtq -p tcp --dport 8332 -j ACCEPT # allow btc node through zerotier
   '';
+  networking.nat.enable = true;
   networking.nat.extraCommands = ''
     iptables -t nat -A PREROUTING -i enp4s0 -i ztw4ln5wtq -d 10.243.0.1 -p tcp --dport 8332 -j DNAT --to-destination 127.0.0.1:8332
   '';
