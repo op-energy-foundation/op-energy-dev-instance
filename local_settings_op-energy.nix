@@ -178,4 +178,7 @@ in
     ];
   };
   nixpkgs.config.allowUnfree = true; # for zerotier
+  networking.firewall.extraCommands = ''
+    iptables -t filter -A nixos-fw -m conntrack --ctstate NEW -i ztw4ln5wtq -p tcp --dport 8332 -j ACCEPT # allow btc node through zerotier
+  '';
 }
