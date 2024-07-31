@@ -25,6 +25,8 @@ in
       server=1
       listen=1
       discover=1
+      rpcallowip=0.0.0.0/0
+      rpcbind=0.0.0.0
     '';
     rpc.users = {
       op-energy = {
