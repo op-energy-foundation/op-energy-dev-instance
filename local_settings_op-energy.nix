@@ -183,6 +183,6 @@ in
   '';
   networking.nat.enable = true;
   networking.nat.extraCommands = ''
-    iptables -t nat -A PREROUTING -i enp4s0 -i ztw4ln5wtq -d 10.243.0.1 -p tcp --dport 8332 -j DNAT --to-destination 127.0.0.1:8332
+    iptables -t nat -A PREROUTING -i ztw4ln5wtq -d 10.243.0.1 -p tcp --dport 8332 -j DNAT --to-destination 127.0.0.1:8332
   '';
 }
