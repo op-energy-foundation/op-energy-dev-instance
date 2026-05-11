@@ -2,3 +2,7 @@
 	path = overlays/op-energy
 	url = ssh://git@github.com/op-energy-foundation/op-energy
 	branch = devel
+[submodule "overlays/op-energy-frontend"]
+	path = overlays/op-energy-frontend
+	url = ssh://git@github.com/op-energy-foundation/op-energy-frontend
+	branch = devel
