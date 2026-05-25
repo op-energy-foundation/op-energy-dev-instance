@@ -10,3 +10,7 @@
 	path = overlays/op-energy-blockspan-service
 	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
 	branch = devel
+[submodule "overlays/cypher-block"]
+	path = overlays/cypher-block
+	url = ssh://git@github.com/dambaev/cypher-block.git
+	branch = nix-integration
