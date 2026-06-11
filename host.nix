@@ -1,6 +1,6 @@
 env@{
   GIT_COMMIT_HASH ? ""
-, OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy/modules/oe-blockspan-service
+, OP_ENERGY_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-blockspan-service
 , OP_ENERGY_FRONTEND_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-frontend
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
   # import psk from out-of-git file
@@ -40,7 +40,7 @@ in
     opEnergyBackendModule
     opEnergyAccountServiceModule
   ];
-  system.stateVersion = "22.05";
+  system.stateVersion = "26.05";
 
   # op-energy part
   services.op-energy-backend = {
