@@ -28,7 +28,6 @@ args@{ pkgs, lib, ...}:
       "41d49af6c2442cb2" # administrated by dambaev
     ];
   };
-  nixpkgs.config.allowUnfree = true; # for zerotier
   systemd.services = {
     node_tunnel = { # we use tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep tunnel alive all the time
       wantedBy = [ "multi-user.target" ];

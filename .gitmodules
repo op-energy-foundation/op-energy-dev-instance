@@ -1,7 +1,10 @@
 [submodule "overlays/op-energy"]
 	path = overlays/op-energy
 	url = ssh://git@github.com/op-energy-foundation/op-energy
-	branch = 17-improve-immutability-of-data
+	branch = 82-update-nixos-modules-to-current-nixos-version
 [submodule "overlays/op-energy-frontend"]
 	path = overlays/op-energy-frontend
 	url = ssh://git@github.com/op-energy-foundation/op-energy-frontend
+[submodule "overlays/op-energy-blockspan-service"]
+	path = overlays/op-energy-blockspan-service
+	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
