@@ -5,6 +5,7 @@
 [submodule "overlays/op-energy-frontend"]
 	path = overlays/op-energy-frontend
 	url = ssh://git@github.com/op-energy-foundation/op-energy-frontend
+	branch = 4-pin-nixpkgs-in-order-to-improve-reproducibility-of-the-builddeploy
 [submodule "overlays/op-energy-blockspan-service"]
 	path = overlays/op-energy-blockspan-service
 	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
