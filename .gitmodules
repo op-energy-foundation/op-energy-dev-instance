@@ -8,3 +8,4 @@
 [submodule "overlays/op-energy-blockspan-service"]
 	path = overlays/op-energy-blockspan-service
 	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
+	branch = 144-update-nixos-modules-to-current-nixos-version
