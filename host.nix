@@ -40,7 +40,7 @@ in
     opEnergyBackendModule
     opEnergyAccountServiceModule
   ];
-  system.stateVersion = "26.05";
+  system.stateVersion = "22.05";
 
   # op-energy part
   services.op-energy-backend = {
