@@ -43,4 +43,5 @@ in
   networking.firewall.allowedTCPPorts = [
     443 # ssl backed service
   ];
+  system.stateVersion = "22.05";
 }
