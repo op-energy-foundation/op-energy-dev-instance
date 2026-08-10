@@ -10,3 +10,7 @@
 	path = overlays/op-energy-blockspan-service
 	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
 	branch = devel
+[submodule "overlays/op-energy-prototype"]
+	path = overlays/op-energy-prototype
+	url = ssh://git@github.com/op-energy-foundation/op-energy-prototype
+	branch = devel
