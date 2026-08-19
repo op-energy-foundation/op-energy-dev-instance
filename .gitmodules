@@ -13,3 +13,6 @@
 [submodule "overlays/op-energy-prototype"]
 	path = overlays/op-energy-prototype
 	url = ssh://git@github.com/op-energy-foundation/op-energy-prototype
+[submodule "overlays/op-energy-mvp"]
+	path = overlays/op-energy-mvp
+	url = ssh://git@github.com/op-energy-foundation/op-energy-mvp
