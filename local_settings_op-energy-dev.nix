@@ -32,7 +32,24 @@ in
   imports = [
     local_settings_development # this instance is development
     (import ./overlays/op-energy-mvp/module-frontend.nix env)
-    (import ./overlays/op-energy-prototype/module-frontend.nix env)
+    # The prototype is served under /prototype on the MVP host, so it has to
+    # be built with a matching vite base -- otherwise its index.html requests
+    # /assets/... and is handed the MVP bundle. Its own module is not imported,
+    # since that would define a vhost of its own.
+    { nixpkgs.overlays = [
+        (self: super: {
+          op-energy-frontend-prototype-subpath =
+            super.op-energy-frontend-prototype.overrideAttrs (old: {
+              buildPhase = builtins.replaceStrings
+                [ "npm run build" ] [ "npm run build -- --base=/prototype/" ]
+                old.buildPhase;
+            });
+        })
+        (import ./overlays/op-energy-prototype/overlay.nix {
+          GIT_COMMIT_HASH = GIT_COMMIT_HASH OPENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION;
+        })
+      ];
+    }
   ];
 
   users.users.nginx.extraGroups = [ "acme" ];
@@ -49,7 +66,7 @@ in
         # Since we have a wildcard vhost to handle port 80,
         # we can generate certs for anything!
         # Just make sure your DNS resolves them.
-        extraDomainNames = [ "dev-exchange.op-energy.info" "prototype.dev-exchange.op-energy.info" ];
+        extraDomainNames = [ "dev-exchange.op-energy.info" ];
       };
     };
   };
@@ -65,15 +82,18 @@ in
         serverName = "dev-exchange.op-energy.info";
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
-      };
-      # the prototype stays deployed for comparison, on its own hostname:
-      # both apps use absolute asset paths (/assets/...), so serving one
-      # under a path prefix would make its index.html request the other's
-      # bundle
-      op-energy-frontend-prototype = {
-        serverName = "prototype.dev-exchange.op-energy.info";
-        forceSSL = true;
-        useACMEHost = "dev-exchange.op.energy";
+        # The prototype stays reachable at /prototype for comparison. It is
+        # rebuilt with vite base=/prototype/ (see the overlay below), so its
+        # index.html asks for /prototype/assets/... rather than /assets/...,
+        # which would otherwise collide with the MVP served at the root.
+        locations."/prototype" = {
+          return = "301 /prototype/";
+        };
+        locations."/prototype/" = {
+          alias = "${pkgs.op-energy-frontend-prototype-subpath}/";
+          index = "index.html";
+          tryFiles = "$uri $uri/ /prototype/index.html =404";
+        };
       };
     };
   };
