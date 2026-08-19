@@ -4,6 +4,7 @@ env@
 args@
 { pkgs
 , lib
+, OPENERGY_MVP_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-mvp
 , OPENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-prototype
 , ...
 }:
@@ -30,6 +31,7 @@ in
 {
   imports = [
     local_settings_development # this instance is development
+    (import ./overlays/op-energy-mvp/module-frontend.nix env)
     (import ./overlays/op-energy-prototype/module-frontend.nix env)
   ];
 
@@ -47,7 +49,7 @@ in
         # Since we have a wildcard vhost to handle port 80,
         # we can generate certs for anything!
         # Just make sure your DNS resolves them.
-        extraDomainNames = [ "dev-exchange.op-energy.info" ];
+        extraDomainNames = [ "dev-exchange.op-energy.info" "prototype.dev-exchange.op-energy.info" ];
       };
     };
   };
@@ -59,8 +61,17 @@ in
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
       };
-      op-energy-frontend-prototype = {
+      op-energy-mvp = {
         serverName = "dev-exchange.op-energy.info";
+        forceSSL = true;
+        useACMEHost = "dev-exchange.op.energy";
+      };
+      # the prototype stays deployed for comparison, on its own hostname:
+      # both apps use absolute asset paths (/assets/...), so serving one
+      # under a path prefix would make its index.html request the other's
+      # bundle
+      op-energy-frontend-prototype = {
+        serverName = "prototype.dev-exchange.op-energy.info";
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
       };
