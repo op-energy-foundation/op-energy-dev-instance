@@ -1,5 +1,6 @@
 env@
 { GIT_COMMIT_HASH ? ""
+, ...
 }:
 args@
 { pkgs
