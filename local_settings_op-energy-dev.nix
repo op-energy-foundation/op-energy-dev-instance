@@ -24,7 +24,6 @@ let
         printf $HASH > $out
       ''
     );
-  args1 = args // { GIT_COMMIT_HASH = GIT_COMMIT_HASH OPENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION;};
 in
 {
   imports = [
