@@ -4,8 +4,6 @@ env@
 args@
 { pkgs
 , lib
-, OPENERGY_MVP_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-mvp
-, OPENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-prototype
 , ...
 }:
 
@@ -31,25 +29,6 @@ in
 {
   imports = [
     local_settings_development # this instance is development
-    (import ./overlays/op-energy-mvp/module-frontend.nix env)
-    # The prototype is served under /prototype on the MVP host, so it has to
-    # be built with a matching vite base -- otherwise its index.html requests
-    # /assets/... and is handed the MVP bundle. Its own module is not imported,
-    # since that would define a vhost of its own.
-    { nixpkgs.overlays = [
-        (self: super: {
-          op-energy-frontend-prototype-subpath =
-            super.op-energy-frontend-prototype.overrideAttrs (old: {
-              buildPhase = builtins.replaceStrings
-                [ "npm run build" ] [ "npm run build -- --base=/prototype/" ]
-                old.buildPhase;
-            });
-        })
-        (import ./overlays/op-energy-prototype/overlay.nix {
-          GIT_COMMIT_HASH = GIT_COMMIT_HASH OPENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION;
-        })
-      ];
-    }
   ];
 
   users.users.nginx.extraGroups = [ "acme" ];
@@ -90,7 +69,7 @@ in
           return = "301 /prototype/";
         };
         locations."/prototype/" = {
-          alias = "${pkgs.op-energy-frontend-prototype-subpath}/";
+          alias = "${pkgs.op-energy-frontend-prototype}/";
           index = "index.html";
           tryFiles = "$uri $uri/ /prototype/index.html =404";
         };
