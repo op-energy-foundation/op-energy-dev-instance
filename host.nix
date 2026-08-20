@@ -35,10 +35,11 @@ let
   opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION; };
   opEnergyBackendModule = import ./overlays/op-energy-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
+  local_settings = import ./local_settings.nix env;
 in
 {
   imports = [
-    ./local_settings.nix
+    local_settings
     # custom module for op-energy
     opEnergyFrontendModule
     opEnergyFrontendPrototypeModule

@@ -1,8 +1,9 @@
+env:
 args@{ pkgs, lib, ...}:
 let
   hostname = import ./local_hostname.nix;
   host_local_settings = ./. + "/local_settings_${hostname}.nix";
-  hostModule = import host_local_settings {};
+  hostModule = import host_local_settings env;
 in
 {
   imports = [
