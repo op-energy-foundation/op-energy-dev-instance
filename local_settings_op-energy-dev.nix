@@ -68,7 +68,7 @@ in
           return = "301 /prototype/";
         };
         locations."/prototype/" = {
-          alias = "${pkgs.op-energy-frontend-prototype}/";
+          alias = "${pkgs.op-energy-frontend-prototype "/prototype/"}/";
           index = "index.html";
           tryFiles = "$uri $uri/ /prototype/index.html =404";
         };
