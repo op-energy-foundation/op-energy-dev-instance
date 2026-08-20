@@ -38,6 +38,7 @@ let
 in
 {
   imports = [
+    ./local_settings.nix
     # custom module for op-energy
     opEnergyFrontendModule
     opEnergyFrontendPrototypeModule
