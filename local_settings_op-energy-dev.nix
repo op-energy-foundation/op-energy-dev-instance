@@ -5,6 +5,7 @@ env@
 args@
 { pkgs
 , lib
+, config
 , ...
 }:
 
