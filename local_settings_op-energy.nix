@@ -95,16 +95,7 @@ in
         # Since we have a wildcard vhost to handle port 80,
         # we can generate certs for anything!
         # Just make sure your DNS resolves them.
-        extraDomainNames = [ "bitcoin.op.energy" ];
-      };
-    };
-  };
-
-  services.nginx = {
-    virtualHosts = {
-      op-energy = {
-        forceSSL = true;
-        useACMEHost = "op.energy";
+        extraDomainNames = [ "bitcoin.op.energy" "exchange.op-energy.info" ];
       };
     };
   };
