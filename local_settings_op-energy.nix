@@ -4,7 +4,7 @@ env@
 , mainnet_volume ? builtins.readFile ("/etc/nixos/private/mainnet-volume")
 , ...
 }:
-args@{ pkgs, lib, ...}:
+args@{ pkgs, lib, config, ...}:
 
 let
   local_settings_production = import ./local_settings_production.nix env;
@@ -56,6 +56,23 @@ let
     {{ end }}
     {{ end }}
   '';
+  op-energy-frontend-prototype-subroute = subroute:
+    lib.recursiveUpdate
+    {
+      locations."${subroute}" = {
+        return = "301 ${subroute}/";
+      };
+      locations."${subroute}/" = {
+        alias = "${pkgs.op-energy-frontend-prototype "${subroute}/"}/";
+        index = "index.html";
+        tryFiles = "$uri $uri/ ${subroute}/index.html =404";
+      };
+    }
+    ( lib.recursiveUpdate
+      (pkgs.op-energy-blockspans-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8999")
+      (pkgs.op-energy-account-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8899")
+    )
+    ;
 in
 {
   imports = [
@@ -185,4 +202,18 @@ in
   networking.nat.extraCommands = ''
     iptables -t nat -A nixos-nat-pre -i ztw4ln5wtq -d 10.243.0.1 -p tcp --dport 8332 -j DNAT --to-destination 127.0.0.1:8332 # from zerotier to node
   '';
+  services.nginx = {
+    virtualHosts = {
+      op-energy = {
+        serverName = "op.energy";
+        forceSSL = true;
+        useACMEHost = "op.energy";
+      };
+      op-energy-mvp = lib.recursiveUpdate {
+        serverName = "exchange.op-energy.info";
+        forceSSL = true;
+        useACMEHost = "op.energy";
+      } (op-energy-frontend-prototype-subroute "/prototype");
+    };
+  };
 }
