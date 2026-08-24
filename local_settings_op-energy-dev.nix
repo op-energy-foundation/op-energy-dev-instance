@@ -25,6 +25,23 @@ let
         printf $HASH > $out
       ''
     );
+  op-energy-frontend-prototype-subroute = subroute:
+    lib.recursiveUpdate
+    {
+      locations."${subroute}" = {
+        return = "301 ${subroute}/";
+      };
+      locations."${subroute}/" = {
+        alias = "${pkgs.op-energy-frontend-prototype "${subroute}/"}/";
+        index = "index.html";
+        tryFiles = "$uri $uri/ ${subroute}/index.html =404";
+      };
+    }
+    ( lib.recursiveUpdate
+      (pkgs.op-energy-blockspans-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8999")
+      (pkgs.op-energy-account-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8899")
+    )
+    ;
 in
 {
   imports = [
@@ -57,23 +74,11 @@ in
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
       };
-      op-energy-mvp = {
+      op-energy-mvp = lib.recursiveUpdate {
         serverName = "dev-exchange.op-energy.info";
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
-        # The prototype stays reachable at /prototype for comparison. It is
-        # rebuilt with vite base=/prototype/ (see the overlay below), so its
-        # index.html asks for /prototype/assets/... rather than /assets/...,
-        # which would otherwise collide with the MVP served at the root.
-        locations."/prototype" = {
-          return = "301 /prototype/";
-        };
-        locations."/prototype/" = {
-          alias = "${pkgs.op-energy-frontend-prototype "/prototype/"}/";
-          index = "index.html";
-          tryFiles = "$uri $uri/ /prototype/index.html =404";
-        };
-      };
+      } (op-energy-frontend-prototype-subroute "/prototype");
     };
   };
 
