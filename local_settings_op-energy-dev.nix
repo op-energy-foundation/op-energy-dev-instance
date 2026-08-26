@@ -87,5 +87,14 @@ in
   networking.firewall.allowedTCPPorts = [
     443 # ssl backed service
   ];
+  users.users.erik = {
+    isNormalUser = true;
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCl3sFieaXO8pLDGxvpPt3Erx0fgQyFuLkDSIfSdklGtM0UxPmmarSKnSzaVgdEHRfJqcPUxkA+43Wba+j84wqmnPVuHX7IpiZh4gzpfcE2xuBrgh7fwerVCexq7wZhQRcBCMfjE6f0Qvrgpmj5+2Uax1ngL+LE8Mqr6dJJlHhVN27/wx9XcQM1+Z+P5NfbDhhvGNEzRILYrbujqZFEAQlO5wTVRCVhGv8ma45jjVCcl5EvRn0OLHlOkesU8tlqpbfKmAFY5CPrGnu6h2Hu83LtpXmobLKWolATkayYr8hvgB+Mgw6jLqRfh4l+BPDvQ7WdsSAeIFzmEUWKWkgg316Y4tJxTX2iKJzZo7dZh391iF5adVvst93fcCF8S7js/tPHdhqFPEgq89HsNHf46RLtTqJBpT9YFOJuLgO+p307+wmpR2k1LCxi6Yovr9EKqGArXrDMogUmdtr6A+VQgXtA2qTtVZX600PsVV/mFCtcthlTO6uGhxpzH1apDs1rPPbYmUfdF1P5YVF97MWIwqYfDwUDgtl7UQqaUNYI2ufuX4xmA+5vm5mJ3HFWdbjYR27yiAv5I2jccd0YqrGyLm+vwoTC19SVNC6WnUZRxx0pRZX6JSeu4GaLa3lBKHdqfq9BsjJ6H4GbBCxNiR4XqKv/qAe5C10VejyBIk17IGO3rQ== erik@velascommerce.com" # 2025.11.19
+    ];
+  };
+  users.users.user = {
+    isNormalUser = true;
+  };
   system.stateVersion = "22.05";
 }
