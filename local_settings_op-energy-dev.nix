@@ -40,7 +40,10 @@ let
     }
     ( lib.recursiveUpdate
       (pkgs.op-energy-blockspans-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8999")
-      (pkgs.op-energy-account-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8899")
+      ( lib.recursiveUpdate
+        (pkgs.op-energy-account-service-nginx-vhost-config {config = config; } "${subroute}/" "http://127.0.0.1:8899")
+        (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "${subroute}/" "http://127.0.0.1:8998" )
+      )
     )
     ;
 in
@@ -75,11 +78,16 @@ in
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
       };
-      op-energy-mvp = lib.recursiveUpdate {
-        serverName = "dev-exchange.op-energy.info";
-        forceSSL = true;
-        useACMEHost = "dev-exchange.op.energy";
-      } (op-energy-frontend-prototype-subroute "/prototype");
+      op-energy-mvp = lib.recursiveUpdate
+        {
+          serverName = "dev-exchange.op-energy.info";
+          forceSSL = true;
+          useACMEHost = "dev-exchange.op.energy";
+        }
+        ( lib.recursiveUpdate
+          (op-energy-frontend-prototype-subroute "/prototype")
+          (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "/prototype/" "http://127.0.0.1:8998")
+        );
     };
   };
 
