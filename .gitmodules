@@ -16,3 +16,6 @@
 [submodule "overlays/op-energy-mvp"]
 	path = overlays/op-energy-mvp
 	url = ssh://git@github.com/op-energy-foundation/op-energy-mvp
+[submodule "overlays/op-energy-api-swagger-ui"]
+	path = overlays/op-energy-api-swagger-ui
+	url = ssh://git@github.com/op-energy-foundation/op-energy-api-swagger-ui.git
