@@ -211,7 +211,7 @@ in
         }
         ( lib.recursiveUpdate
           (op-energy-frontend-prototype-subroute "/prototype")
-          (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "/prototype/" "http://127.0.0.1:8998")
+          (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8998")
         );
     };
   };
