@@ -86,7 +86,16 @@ in
         }
         ( lib.recursiveUpdate
           (op-energy-frontend-prototype-subroute "/prototype")
-          (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8998")
+          ( lib.recursiveUpdate
+            (pkgs.op-energy-api-swagger-ui-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8998")
+            ( lib.recursiveUpdate
+              (pkgs.op-energy-account-service-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8899")
+              ( lib.recursiveUpdate
+                (pkgs.op-energy-blockspans-service-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8999")
+                (pkgs.op-energy-offer-service-nginx-vhost-config { config = config; } "/" "http://127.0.0.1:8909")
+              )
+            )
+          )
         );
     };
   };
