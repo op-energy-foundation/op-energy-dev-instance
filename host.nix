@@ -11,6 +11,7 @@ env@{
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
 , op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
 , op-energy-account-token-encryption-key ? builtins.readFile ( "/etc/nixos/private/op-energy-account-token-encryption-key.txt")
+, op-energy-internal-service-shared-secret ? builtins.readFile ( "/etc/nixos/private/op-energy-internal-service-shared-secret.txt")
 , ...
 }:
 args@{ pkgs, lib, config, ...}:
@@ -36,6 +37,7 @@ let
   opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION; };
   opEnergyBackendModule = import ./overlays/op-energy-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
+  opEnergyOfferServiceModule = import ./overlays/op-energy/oe-offer-service/op-energy-offer-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyApiSwaggerUIModule = import ./overlays/op-energy-api-swagger-ui/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION; };
   local_settings = import ./local_settings.nix env;
 in
@@ -48,6 +50,7 @@ in
     opEnergyFrontendMVPModule
     opEnergyBackendModule
     opEnergyAccountServiceModule
+    opEnergyOfferServiceModule
     opEnergyApiSwaggerUIModule
   ];
   system.stateVersion = "22.05";
@@ -99,7 +102,30 @@ in
         "API_HTTP_PORT": 8899,
         "PROMETHEUS_PORT": 7899,
         "LOG_LEVEL_MIN": "Debug",
-        "SCHEDULER_POLL_RATE_SECS": 10
+        "SCHEDULER_POLL_RATE_SECS": 10,
+        "INTERNAL_SERVICE_SHARED_SECRET": "${op-energy-internal-service-shared-secret}"
+      }
+    '';
+  };
+
+  services.op-energy-offer-service = {
+    enable = true;
+    db_name = "openergyoffer";
+    db_user = "openergy";
+    db_psk = op-energy-db-psk-mainnet;
+    config = ''
+      {
+        "DB_PORT": 5432,
+        "DB_HOST": "127.0.0.1",
+        "DB_USER": "openergy",
+        "DB_NAME": "openergyoffer",
+        "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
+        "API_HTTP_PORT": 8909,
+        "PROMETHEUS_PORT": 7909,
+        "LOG_LEVEL_MIN": "Debug",
+        "SCHEDULER_POLL_RATE_SECS": 60,
+        "ACCOUNT_SERVICE_API_URL": "http://127.0.0.1:8899",
+        "INTERNAL_SERVICE_SHARED_SECRET": "${op-energy-internal-service-shared-secret}"
       }
     '';
   };
