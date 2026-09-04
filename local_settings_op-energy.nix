@@ -80,6 +80,7 @@ in
 {
   imports = [
     local_settings_production # this node is production
+    ./lnbits_service.nix
   ];
 
   system.stateVersion = "22.05";
