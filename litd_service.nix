@@ -27,7 +27,7 @@ in
         Type = "simple";
       };
       path = with pkgs; [
-        litd postgresql
+        lightning-terminal postgresql
       ];
       preStart = '' exit 0 '';
 
