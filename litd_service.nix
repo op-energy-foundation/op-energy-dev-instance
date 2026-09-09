@@ -27,7 +27,7 @@ in
         Type = "simple";
       };
       path = with pkgs; [
-        postgresql
+        litd postgresql
       ];
       preStart = '' exit 0 '';
 
