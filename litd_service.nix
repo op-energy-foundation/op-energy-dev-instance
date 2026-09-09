@@ -3,7 +3,7 @@ env@{
 , bitcoind-signet-rpc-psk
 , ...
 }:
-args@{ pkgs, lib, ...}:
+args@{ pkgs, lib, config, ...}:
 
 let
   cfg = config.services.litd_terminal_service;
