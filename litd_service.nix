@@ -28,7 +28,7 @@ in
          --lnd-mode=integrated \
          --lnd.lnddir=/root/.lnd \
          --lnd.alias=merchant \
-         --lnd.externalip=${config.services.nginx.op-energy-mvp.serverName} \
+         --lnd.externalip=${config.services.nginx.virtualHosts.op-energy-mvp.serverName} \
          --lnd.rpclisten=127.0.0.1:10009 \
          --lnd.listen=127.0.0.1:9735 \
          --lnd.bitcoin.node=bitcoind \
