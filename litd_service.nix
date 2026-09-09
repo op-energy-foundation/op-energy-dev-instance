@@ -12,6 +12,33 @@ in
   options.services.litd_terminal_service = {
     enable = lib.mkEnableOption "litd_terminal service";
 
+    http_port = lib.mkOption {
+      type = lib.types.int;
+      example = 7000;
+      default = 7000;
+      description = ''
+        defines port for litd
+      '';
+    };
+
+    lnd_port = lib.mkOption {
+      type = lib.types.int;
+      example = 9735;
+      default = 9735;
+      description = ''
+        defines LND port
+      '';
+    };
+
+    lnd_rpc_port = lib.mkOption {
+      type = lib.types.int;
+      example = 10009;
+      default = 10009;
+      description = ''
+        defines LND rpc port
+      '';
+    };
+
   };
 
   config = lib.mkIf cfg.enable {
@@ -33,15 +60,15 @@ in
 
       script = ''
        litd \
-         --httpslisten=0.0.0.0:8443 \
+         --insecure-httplisten=127.0.0.1:${toString cfg.http_port} \
          --uipassword=${litd_ui_password} \
          --network=signet \
          --lnd-mode=integrated \
          --lnd.lnddir=/root/.lnd \
          --lnd.alias=merchant \
          --lnd.externalip=${config.services.nginx.virtualHosts.op-energy-mvp.serverName} \
-         --lnd.rpclisten=127.0.0.1:10009 \
-         --lnd.listen=127.0.0.1:9735 \
+         --lnd.rpclisten=127.0.0.1:${toString cfg.lnd_rpc_port} \
+         --lnd.listen=127.0.0.1:${toString cfg.lnd_port} \
          --lnd.bitcoin.node=bitcoind \
          --lnd.bitcoind.rpchost=localhost \
          --lnd.bitcoind.rpcuser=sop-energy \
