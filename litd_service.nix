@@ -52,16 +52,23 @@ in
       requires = [ "postgresql.service" ];
       serviceConfig = {
         Type = "simple";
+        LoadCredential =
+          [ "litd_ui_password:/etc/nixos/private/litd_ui_password"
+            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.pass"
+          ];
       };
       path = with pkgs; [
-        lightning-terminal postgresql
+        lightning-terminal postgresql systemd
       ];
-      preStart = '' exit 0 '';
 
       script = ''
+       set -x
+       env | grep CREDENTIALS_DIRECTORY
+       echo $(cat $CREDENTIALS_DIRECTORY/litd_ui_password)
+       systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -
        litd \
          --insecure-httplisten=127.0.0.1:${toString cfg.http_port} \
-         --uipassword=${litd_ui_password} \
+         --uipassword=$(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -) \
          --network=signet \
          --lnd-mode=integrated \
          --lnd.lnddir=/root/.lnd \
@@ -72,7 +79,7 @@ in
          --lnd.bitcoin.node=bitcoind \
          --lnd.bitcoind.rpchost=localhost \
          --lnd.bitcoind.rpcuser=sop-energy \
-         --lnd.bitcoind.rpcpass=${bitcoind-signet-rpc-psk} \
+         --lnd.bitcoind.rpcpass=$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk) \
          --lnd.bitcoind.zmqpubrawblock=localhost:28332 \
          --lnd.bitcoind.zmqpubrawtx=localhost:28333 \
          --lnd.debuglevel=debug \
@@ -81,7 +88,7 @@ in
          --faraday.connect_bitcoin \
          --faraday.bitcoin.host=localhost \
          --faraday.bitcoin.user=sop-energy \
-         --faraday.bitcoin.password=${bitcoind-signet-rpc-psk}
+         --faraday.bitcoin.password=$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)
       '';
     };
   };
