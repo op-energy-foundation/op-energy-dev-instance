@@ -60,8 +60,6 @@ in
       path = with pkgs; [
         lightning-terminal postgresql
       ];
-      preStart = '' exit 0 '';
-
 
       script = ''
        litd \
