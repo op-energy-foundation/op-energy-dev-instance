@@ -15,7 +15,6 @@ in
 {
   imports = [
     "${lnbitsFlake}/nix/modules/lnbits-service.nix"
-    ./lnbits_service.nix
     litd_service
   ];
   services.bitcoind = {
