@@ -62,7 +62,7 @@ in
       # LND_REST_MACAROON = "/path/to/admin.macaroon";
     };
   };
-  services.litd = {
+  services.litd_terminal_service = {
     enable = true;
   };
 }
