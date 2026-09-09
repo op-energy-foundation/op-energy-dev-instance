@@ -42,6 +42,7 @@ in
       enable = true;
       extraCmdlineOptions = [ "-signet" ];
       extraConfig = ''
+        [signet]
         txindex = 1
         server=1
         listen=1
