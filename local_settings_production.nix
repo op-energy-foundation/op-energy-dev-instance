@@ -1,8 +1,6 @@
 env@{
   bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
 , bitcoind-mainnet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-pskhmac.txt")
-, bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
-, bitcoind-signet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt")
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
 , op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
 , ...
@@ -35,25 +33,6 @@ in
         op-energy = {
           name = "op-energy";
           passwordHMAC = "${bitcoind-mainnet-rpc-pskhmac}";
-        };
-      };
-    };
-    signet = {
-      enable = true;
-      extraCmdlineOptions = [ "-signet" ];
-      extraConfig = ''
-        [signet]
-        txindex = 1
-        server=1
-        listen=1
-        discover=1
-        rpcallowip=127.0.0.1/32
-        rpcbind=127.0.0.1
-      '';
-      rpc.users = {
-        op-energy = {
-          name = "sop-energy";
-          passwordHMAC = "${bitcoind-signet-rpc-pskhmac}";
         };
       };
     };
