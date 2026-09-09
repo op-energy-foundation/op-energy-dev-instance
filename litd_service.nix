@@ -54,7 +54,7 @@ in
         Type = "simple";
         LoadCredential =
           [ "litd_ui_password:/etc/nixos/private/litd_ui_password.pass"
-            "bitcoind-signet-rpc-psk:/etc/nixos/bitcoind-signet-rpc-psk.pass"
+            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.pass"
           ];
       };
       path = with pkgs; [
