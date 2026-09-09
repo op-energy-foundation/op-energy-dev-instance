@@ -20,6 +20,17 @@ in
       [ lightning-terminal
       ];
     systemd.services.litd = {
+      wantedBy = [ "multi-user.target" ];
+      after = [ "postgresql.service" ];
+      requires = [ "postgresql.service" ];
+      serviceConfig = {
+        Type = "simple";
+      };
+      path = with pkgs; [
+        postgresql
+      ];
+      preStart = '' exit 0 '';
+
       script = ''
        litd \
          --httpslisten=0.0.0.0:8443 \
