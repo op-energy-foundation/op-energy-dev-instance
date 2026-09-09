@@ -77,7 +77,7 @@ in
          --lnd.bitcoin.node=bitcoind \
          --lnd.bitcoind.rpchost=localhost \
          --lnd.bitcoind.rpcuser=sop-energy \
-         --lnd.bitcoind.rpcpass=$(cat \${${CREDENTIALS_DIRECTORY}/bitcoind-signet-rpc-psk}) \
+         --lnd.bitcoind.rpcpass=$(cat \${CREDENTIALS_DIRECTORY}/bitcoind-signet-rpc-psk}) \
          --lnd.bitcoind.zmqpubrawblock=localhost:28332 \
          --lnd.bitcoind.zmqpubrawtx=localhost:28333 \
          --lnd.debuglevel=debug \
@@ -86,7 +86,7 @@ in
          --faraday.connect_bitcoin \
          --faraday.bitcoin.host=localhost \
          --faraday.bitcoin.user=sop-energy \
-         --faraday.bitcoin.password=$(cat \${${CREDENTIALS_DIRECTORY}/bitcoind-signet-rpc-psk})
+         --faraday.bitcoin.password=$(cat \${CREDENTIALS_DIRECTORY}/bitcoind-signet-rpc-psk})
       '';
     };
   };
