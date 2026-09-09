@@ -9,7 +9,11 @@ args@{
 }:
 
 let
-  litd_service = import ./litd_service.nix env;
+  litd_service = import ./litd_service.nix (env //
+    { bitcoind-signet-rpc-pskhmac = bitcoind-signet-rpc-pskhmac
+    ; bitcoind-signet-rpc-psk = bitcoind-signet-rpc-psk
+    ;
+    });
   lnbitsFlake = builtins.getFlake "github:lnbits/lnbits";
 in
 {
