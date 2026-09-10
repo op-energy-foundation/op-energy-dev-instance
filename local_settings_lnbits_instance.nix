@@ -64,6 +64,6 @@ in
     bitcoin_user = "sop-energy";
     bitcoin_pass = bitcoind-signet-rpc-psk;
     lnd_external_ip = config.services.nginx.virtualHosts.op-energy-mvp.serverName;
-    ui_password =
+    ui_password = litd_ui_password;
   };
 }
