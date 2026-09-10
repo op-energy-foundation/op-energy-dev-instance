@@ -62,6 +62,7 @@ in
       ];
 
       script = ''
+       set -x
        env | grep CREDENTIALS_DIRECTORY
        echo $(cat $CREDENTIALS_DIRECTORY/litd_ui_password)
        systemd-creds decrypt $CREDENTIALS_DIRECTORY/litd_ui_password -
