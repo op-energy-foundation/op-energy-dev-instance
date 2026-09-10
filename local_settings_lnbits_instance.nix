@@ -1,6 +1,7 @@
 env@{
   bitcoind-signet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt")
 , bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
+, litd_ui_password ? builtins.readFile ( "/etc/nixos/private/litd_ui_password.txt")
 , ...
 }:
 args@{
@@ -9,17 +10,12 @@ args@{
 }:
 
 let
-  litd_service = import ./litd_service.nix (env //
-    { bitcoind-signet-rpc-pskhmac = bitcoind-signet-rpc-pskhmac
-    ; bitcoind-signet-rpc-psk = bitcoind-signet-rpc-psk
-    ;
-    });
   lnbitsFlake = builtins.getFlake "github:lnbits/lnbits";
 in
 {
   imports = [
     "${lnbitsFlake}/nix/modules/lnbits-service.nix"
-    litd_service
+    ./litd_service.nix
   ];
   services.bitcoind = {
     signet = {
@@ -64,5 +60,10 @@ in
   };
   services.litd_terminal_service = {
     enable = true;
+    bitcoin_network = "signet";
+    bitcoin_user = "sop-energy";
+    bitcoin_pass = bitcoind-signet-rpc-psk;
+    lnd_external_ip = config.services.nginx.virtualHosts.op-energy-mvp.serverName;
+    ui_password =
   };
 }

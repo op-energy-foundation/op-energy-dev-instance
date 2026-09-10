@@ -1,8 +1,3 @@
-env@{
-  litd_ui_password ? builtins.readFile ( "/etc/nixos/private/litd_ui_password.txt")
-, bitcoind-signet-rpc-psk
-, ...
-}:
 args@{ pkgs, lib, config, ...}:
 
 let
@@ -12,16 +7,24 @@ in
   options.services.litd_terminal_service = {
     enable = lib.mkEnableOption "litd_terminal service";
 
-    http_port = lib.mkOption {
-      type = lib.types.int;
-      example = 7000;
-      default = 7000;
+    insecure-httplisten = lib.mkOption {
+      type = lib.types.str;
+      example = "localhost:7000";
+      default = "localhost:7000";
       description = ''
-        defines port for litd
+        defines http listen for litd
       '';
     };
 
-    lnd_port = lib.mkOption {
+    lnd_ui_password = lib.mkOption {
+      type = lib.types.str;
+      example = "pwd";
+      description = ''
+        defines LND UI password
+      '';
+    };
+
+    lnd_host_port = lib.mkOption {
       type = lib.types.int;
       example = 9735;
       default = 9735;
@@ -30,18 +33,116 @@ in
       '';
     };
 
-    lnd_rpc_port = lib.mkOption {
-      type = lib.types.int;
-      example = 10009;
-      default = 10009;
+    lnd_rpc_host_port = lib.mkOption {
+      type = lib.types.str;
+      example = "localhost:10009";
+      default = "localhost:10009";
       description = ''
-        defines LND rpc port
+        defines LND rpc host:port
+      '';
+    };
+
+    bitcoin_network = lib.mkOption {
+      type = lib.types.str;
+      example = "mainnet";
+      default = "signet";
+      description = ''
+        defines bitcoin network to connect to
+      '';
+    };
+
+    bitcoin_host = lib.mkOption {
+      type = lib.types.str;
+      example = "localhost";
+      default = "localhost";
+      description = ''
+        defines bitcoind host to connect to
+      '';
+    };
+
+    bitcoin_user = lib.mkOption {
+      type = lib.types.str;
+      example = "op-energy";
+      default = "op-energy";
+      description = ''
+        defines bitcoind user name to connect to bitcoin node with
+      '';
+    };
+
+    bitcoin_pass = lib.mkOption {
+      type = lib.types.str;
+      example = "pwd";
+      description = ''
+        defines bitcoind user's password to connect to bitcoin node with
+      '';
+    };
+
+    lnd_external_ip = lib.mkOption {
+      type = lib.types.str;
+      example = "2.2.2.2";
+      description = ''
+        defines external host name / IP to which user connecting to access lnd
       '';
     };
 
   };
 
   config = lib.mkIf cfg.enable {
+
+    users.user.litd = {
+      isNormalUser = false;
+    };
+    users.groups.litd = {
+      members = [ "litd" ];
+    };
+    environment.etc."lit/lit.conf" = {
+      mode = "0600"
+      text = ''
+        # Application Options
+        insecure-httplisten=${cfg.insecure-httplisten}
+        uipassword=${litd_ui_password}
+        #httpslisten=0.0.0.0:8443
+        #tlscertpath=~/.lit/tls.cert
+        #tlskeypath=~/.lit/tls.key
+        #letsencrypt=true
+        #letsencrypthost=loop.merchant.com
+        lnd-mode=integrated
+        network=${cfg.bitcoin_network}
+
+        # Lnd
+        lnd.lnddir=~/.lnd
+        lnd.alias=merchant
+        lnd.externalip=${cfg.lnd_external_ip}
+        lnd.rpclisten=${cfg.lnd_rpc_host_port}
+        lnd.listen=${cfg.lnd_host_port}
+        lnd.debuglevel=debug
+
+        # Lnd - bitcoin
+        lnd.bitcoin.node=bitcoind
+
+        # Lnd - bitcoind
+        lnd.bitcoind.rpchost=${cfg.bitcoin_host}
+        lnd.bitcoind.rpcuser=${cfg.bitcoin_user}
+        lnd.bitcoind.rpcpass=${cfg.bitcoin_pass}
+        lnd.bitcoind.zmqpubrawblock=localhost:28332
+        lnd.bitcoind.zmqpubrawtx=localhost:28333
+
+        # Loop
+        loop.loopoutmaxparts=5
+
+        # Pool
+        pool.newnodesonly=true
+
+        # Faraday
+        faraday.min_monitored=48h
+
+        # Faraday - bitcoin
+        faraday.connect_bitcoin=true
+        faraday.bitcoin.host=${cfg.bitcoin_host}
+        faraday.bitcoin.user=${cfg.bitcoin_user}
+        faraday.bitcoin.password=${cfg.bitcoin_pass}
+      '';
+    };
 
     environment.systemPackages = with pkgs;
       [ lightning-terminal
@@ -53,42 +154,20 @@ in
       serviceConfig = {
         Type = "simple";
         LoadCredential =
-          [ "litd_ui_password:/etc/nixos/private/litd_ui_password"
-            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.pass"
+          [ "lit.conf:/etc/lit/lit.conf"
           ];
+        User = "litd";
+        Group = "litd";
       };
       path = with pkgs; [
         lightning-terminal postgresql systemd
       ];
 
       script = ''
-       set -x
-       env | grep CREDENTIALS_DIRECTORY
-       echo $(cat $CREDENTIALS_DIRECTORY/litd_ui_password)
-       systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -
-       litd \
-         --insecure-httplisten=127.0.0.1:${toString cfg.http_port} \
-         --uipassword=$(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -) \
-         --network=signet \
-         --lnd-mode=integrated \
-         --lnd.lnddir=/root/.lnd \
-         --lnd.alias=merchant \
-         --lnd.externalip=${config.services.nginx.virtualHosts.op-energy-mvp.serverName} \
-         --lnd.rpclisten=127.0.0.1:${toString cfg.lnd_rpc_port} \
-         --lnd.listen=127.0.0.1:${toString cfg.lnd_port} \
-         --lnd.bitcoin.node=bitcoind \
-         --lnd.bitcoind.rpchost=localhost \
-         --lnd.bitcoind.rpcuser=sop-energy \
-         --lnd.bitcoind.rpcpass=$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk) \
-         --lnd.bitcoind.zmqpubrawblock=localhost:28332 \
-         --lnd.bitcoind.zmqpubrawtx=localhost:28333 \
-         --lnd.debuglevel=debug \
-         --loop.loopoutmaxparts=5 \
-         --faraday.min_monitored=48h \
-         --faraday.connect_bitcoin \
-         --faraday.bitcoin.host=localhost \
-         --faraday.bitcoin.user=sop-energy \
-         --faraday.bitcoin.password=$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)
+       set -e
+       rm ~/.lit/lit.conf || true
+       ln -svf $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
+       litd
       '';
     };
   };
