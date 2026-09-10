@@ -90,8 +90,9 @@ in
   config = lib.mkIf cfg.enable {
 
     users.users.litd = {
-      isSystemUser = true;
+      isNormalUser = true;
       group = "litd";
+      createHome = true;
     };
     users.groups.litd = { };
     environment.etc."lit/lit.conf" = {
