@@ -167,6 +167,7 @@ in
        set -e
        ls -la $CREDENTIALS_DIRECTORY/
        rm ~/.lit/lit.conf || true
+       mkdir ~/.lit
        ln -svf $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
        litd
       '';
