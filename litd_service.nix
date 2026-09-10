@@ -89,7 +89,7 @@ in
 
   config = lib.mkIf cfg.enable {
 
-    users.user.litd = {
+    users.users.litd = {
       isNormalUser = false;
     };
     users.groups.litd = {
