@@ -25,7 +25,7 @@ in
     };
 
     lnd_host_port = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.str;
       example = "localhost:9735";
       default = "localhost:9735";
       description = ''
