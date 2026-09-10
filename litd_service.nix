@@ -64,7 +64,7 @@ in
       script = ''
        env | grep CREDENTIALS_DIRECTORY
        echo $(cat $CREDENTIALS_DIRECTORY/litd_ui_password)
-       echo $(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -)
+       systemd-creds decrypt $CREDENTIALS_DIRECTORY/litd_ui_password -
        litd \
          --insecure-httplisten=127.0.0.1:${toString cfg.http_port} \
          --uipassword=$(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -) \
