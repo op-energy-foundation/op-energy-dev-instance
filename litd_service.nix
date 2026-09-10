@@ -26,10 +26,10 @@ in
 
     lnd_host_port = lib.mkOption {
       type = lib.types.int;
-      example = 9735;
-      default = 9735;
+      example = "localhost:9735";
+      default = "localhost:9735";
       description = ''
-        defines LND port
+        defines LND host:port
       '';
     };
 
