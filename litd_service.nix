@@ -53,7 +53,7 @@ in
       serviceConfig = {
         Type = "simple";
         LoadCredential =
-          [ "litd_ui_password:/etc/nixos/private/litd_ui_password.pass"
+          [ "litd_ui_password:/etc/nixos/private/litd_ui_password"
             "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.pass"
           ];
       };
