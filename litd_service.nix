@@ -96,7 +96,7 @@ in
       members = [ "litd" ];
     };
     environment.etc."lit/lit.conf" = {
-      mode = "0600"
+      mode = "0600";
       text = ''
         # Application Options
         insecure-httplisten=${cfg.insecure-httplisten}
