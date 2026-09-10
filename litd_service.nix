@@ -91,10 +91,9 @@ in
 
     users.users.litd = {
       isSystemUser = true;
+      group = "litd";
     };
-    users.groups.litd = {
-      members = [ "litd" ];
-    };
+    users.groups.litd = { };
     environment.etc."lit/lit.conf" = {
       mode = "0600";
       text = ''
