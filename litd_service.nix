@@ -52,21 +52,22 @@ in
       requires = [ "postgresql.service" ];
       serviceConfig = {
         Type = "simple";
-        LoadCredentialEncrypted =
+        LoadCredential =
           [ "litd_ui_password:/etc/nixos/private/litd_ui_password.pass"
             "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.pass"
           ];
       };
       path = with pkgs; [
-        lightning-terminal postgresql
+        lightning-terminal postgresql systemd
       ];
 
       script = ''
        env | grep CREDENTIALS_DIRECTORY
        echo $(cat $CREDENTIALS_DIRECTORY/litd_ui_password)
+       echo $(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -)
        litd \
          --insecure-httplisten=127.0.0.1:${toString cfg.http_port} \
-         --uipassword=$(cat $CREDENTIALS_DIRECTORY/litd_ui_password) \
+         --uipassword=$(systemd-creds decrypt --name=litd_ui_password $CREDENTIALS_DIRECTORY/litd_ui_password -) \
          --network=signet \
          --lnd-mode=integrated \
          --lnd.lnddir=/root/.lnd \
