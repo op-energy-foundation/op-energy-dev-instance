@@ -16,7 +16,7 @@ in
       '';
     };
 
-    lnd_ui_password = lib.mkOption {
+    litd_ui_password = lib.mkOption {
       type = lib.types.str;
       example = "pwd";
       description = ''
@@ -100,7 +100,7 @@ in
       text = ''
         # Application Options
         insecure-httplisten=${cfg.insecure-httplisten}
-        uipassword=${litd_ui_password}
+        uipassword=${cfg.litd_ui_password}
         #httpslisten=0.0.0.0:8443
         #tlscertpath=~/.lit/tls.cert
         #tlskeypath=~/.lit/tls.key
