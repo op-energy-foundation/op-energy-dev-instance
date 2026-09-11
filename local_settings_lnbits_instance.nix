@@ -53,7 +53,7 @@ in
       LNBITS_ADMIN_UI = "true";
       # Configure your Lightning backend:
       # LNBITS_BACKEND_WALLET_CLASS = "LndRestWallet";
-      # LND_REST_ENDPOINT = "https://localhost:8080";
+      LND_REST_ENDPOINT = "https://${config.services.litd_terminal_service.lnd_rpc_host_port}";
       # LND_REST_CERT = "/path/to/tls.cert";
       # LND_REST_MACAROON = "/path/to/admin.macaroon";
     };
