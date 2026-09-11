@@ -171,7 +171,7 @@ in
        ls -la $CREDENTIALS_DIRECTORY/
        rm ~/.lit/lit.conf || true
        mkdir -p ~/.lit || true
-       cp /etc/lit/lit.conf ~/.lit/lit.conf
+       cp $CREDENTIALS_DIRECTORY//lit.conf ~/.lit/lit.conf
        # TODO: function: key:dir:file -> sed -i "s/key/$(cat dir/file"
        sed -i "s/bitcoind-signet-rpc-psk/$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)/g" ~/.lit/lit.conf
        sed -i "s/litd_ui_password/$(cat $CREDENTIALS_DIRECTORY/litd_ui_password)/g" ~/.lit/lit.conf
