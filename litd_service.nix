@@ -154,26 +154,30 @@ in
       serviceConfig = {
         Type = "simple";
         LoadCredential =
-          [ "lit.conf:/etc/lit/lit.conf"
-            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.txt"
+          # TODO: function: key:dir:file -> "key:dir/file"
+          [ "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.txt"
             "litd_ui_password:/etc/nixos/private/litd_ui_password.txt"
           ];
         User = "litd";
         Group = "litd";
+        PermissionsStartOnly = true;
       };
       path = with pkgs; [
         lightning-terminal postgresql systemd gnused
       ];
-
-      script = ''
+      preStart = ''
        set -ex
        ls -la $CREDENTIALS_DIRECTORY/
        rm ~/.lit/lit.conf || true
        mkdir -p ~/.lit || true
-       cp $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
+       cp /etc/lit/lit.conf ~/.lit/lit.conf
+       # TODO: function: key:dir:file -> sed -i "s/key/$(cat dir/file) ...."
        sed -i "s/bitcoind-signet-rpc-psk/$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)/g" ~/.lit/lit.conf
        sed -i "s/litd_ui_password/$(cat $CREDENTIALS_DIRECTORY/litd_ui_password)/g" ~/.lit/lit.conf
-       litd
+      '';
+
+      script = ''
+        litd
       '';
 
     };
