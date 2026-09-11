@@ -162,11 +162,11 @@ in
         Group = "litd";
       };
       path = with pkgs; [
-        lightning-terminal postgresql systemd
+        lightning-terminal postgresql systemd gnused
       ];
 
       script = ''
-       set -e
+       set -ex
        ls -la $CREDENTIALS_DIRECTORY/
        rm ~/.lit/lit.conf || true
        mkdir -p ~/.lit || true
