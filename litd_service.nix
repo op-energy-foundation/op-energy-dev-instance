@@ -123,7 +123,7 @@ in
         # Lnd - bitcoind
         lnd.bitcoind.rpchost=${cfg.bitcoin_host}
         lnd.bitcoind.rpcuser=${cfg.bitcoin_user}
-        lnd.bitcoind.rpcpass=${cfg.bitcoin_pass}
+        lnd.bitcoind.rpcpass=bitcoind-signet-rpc-psk
         lnd.bitcoind.zmqpubrawblock=localhost:28332
         lnd.bitcoind.zmqpubrawtx=localhost:28333
 
@@ -140,7 +140,7 @@ in
         faraday.connect_bitcoin=true
         faraday.bitcoin.host=${cfg.bitcoin_host}
         faraday.bitcoin.user=${cfg.bitcoin_user}
-        faraday.bitcoin.password=${cfg.bitcoin_pass}
+        faraday.bitcoin.password=bitcoind-signet-rpc-psk
       '';
     };
 
@@ -155,6 +155,8 @@ in
         Type = "simple";
         LoadCredential =
           [ "lit.conf:/etc/lit/lit.conf"
+            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.txt"
+            "litd_ui_password:/etc/nixos/private/litd_ui_password.txt"
           ];
         User = "litd";
         Group = "litd";
@@ -168,9 +170,12 @@ in
        ls -la $CREDENTIALS_DIRECTORY/
        rm ~/.lit/lit.conf || true
        mkdir ~/.lit
-       ln -svf $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
+       cp $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
+       sed -i "s/bitcoind-signet-rpc-psk/$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)/g" ~/.lit/lit.conf
+       sed -i "s/litd_ui_password/$(cat $CREDENTIALS_DIRECTORY/litd_ui_password)/g" ~/.lit/lit.conf
        litd
       '';
+
     };
   };
 
