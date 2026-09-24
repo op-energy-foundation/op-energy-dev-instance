@@ -1,7 +1,7 @@
 [submodule "overlays/op-energy"]
 	path = overlays/op-energy
 	url = ssh://git@github.com/op-energy-foundation/op-energy
-	branch = master
+	branch = fix-security-hardend-services
 [submodule "overlays/op-energy-frontend"]
 	path = overlays/op-energy-frontend
 	url = ssh://git@github.com/op-energy-foundation/op-energy-frontend
@@ -9,7 +9,7 @@
 [submodule "overlays/op-energy-blockspan-service"]
 	path = overlays/op-energy-blockspan-service
 	url = ssh://git@github.com/op-energy-foundation/op-energy-blockspan-service
-	branch = main
+	branch = fix-service-security-hardending
 [submodule "overlays/op-energy-prototype"]
 	path = overlays/op-energy-prototype
 	url = ssh://git@github.com/op-energy-foundation/op-energy-prototype
@@ -22,3 +22,4 @@
 [submodule "overlays/op-energy-ln"]
 	path = overlays/op-energy-ln
 	url = ssh://git@github.com/op-energy-foundation/op-energy-ln.git
+	branch = nixos-integration
