@@ -60,6 +60,10 @@ in
       in {
       db_user = "openergy";
       db_name = db;
+      credentials_locations = {
+        BTC_PASSWORD_SECRET = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_MAINNET_BTC_PASSWORD_SECRET";
+        DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_MAINNET_DB_PASSWORD_SECRET";
+      };
       config = ''
           "DB_PORT": 5432,
           "DB_HOST": "127.0.0.1",
@@ -79,6 +83,12 @@ in
     enable = true;
     db_name = "openergyacc";
     db_user = "openergy";
+    credentials_locations = {
+      DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_DB_PASSWORD_SECRET";
+      ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
+      INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+      SECRET_SALT_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_SECRET_SALT_SECRET";
+    };
     config = ''
         "DB_PORT": 5432,
         "DB_HOST": "127.0.0.1",
