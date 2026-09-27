@@ -94,6 +94,31 @@ in
     };
   };
 
+  # TODO: replace with something more reliable
+  systemd.services = {
+    ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
+      wantedBy = [ "multi-user.target" ];
+      before = [ "op-energy-backend-mainnet.service" ];
+      after = [
+        "network-online.target"
+      ];
+      requires = [
+        "network-online.target"
+      ];
+      serviceConfig = {
+        Type = "simple";
+        Restart = "always"; # we want to keep service always running
+        RestartSec = "10s";
+      };
+      path = with pkgs; [
+        openssh
+      ];
+      script = ''
+        ssh proxy@exchange.op-energy.info -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -n "while true; do sleep 10s; done"
+      '';
+    };
+  };
+
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
     443 # ssl backed service
