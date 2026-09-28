@@ -65,8 +65,6 @@ in
       config = ''
           "DB_PORT": 5432,
           "DB_HOST": "127.0.0.1",
-          "DB_USER": "${db}",
-          "DB_NAME": "${db}",
           "API_HTTP_PORT": 8999,
           "BTC_URL": "http://127.0.0.1:8332",
           "BTC_USER": "op-energy",
@@ -90,8 +88,6 @@ in
     config = ''
         "DB_PORT": 5432,
         "DB_HOST": "127.0.0.1",
-        "DB_USER": "openergy",
-        "DB_NAME": "openergyacc",
         "API_HTTP_PORT": 8899,
         "PROMETHEUS_PORT": 7899,
         "LOG_LEVEL_MIN": "Debug",
@@ -110,8 +106,6 @@ in
     config = ''
         "DB_PORT": 5432,
         "DB_HOST": "127.0.0.1",
-        "DB_USER": "openergy",
-        "DB_NAME": "openergyoffer",
         "API_HTTP_PORT": 8909,
         "PROMETHEUS_PORT": 7909,
         "LOG_LEVEL_MIN": "Debug",
