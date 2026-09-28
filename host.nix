@@ -7,8 +7,6 @@ env@{
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
 , OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-api-swagger-ui
   # import psk from out-of-git file
-, op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
-, op-energy-internal-service-shared-secret ? builtins.readFile ( "/etc/nixos/private/op-energy-internal-service-shared-secret.txt")
 , ...
 }:
 args@{ pkgs, lib, config, ...}:
@@ -82,7 +80,7 @@ in
   services.op-energy-account-service = {
     enable = true;
     db_name = "openergyacc";
-    db_user = "openergy";
+    db_user = "openergyacc";
     credentials_locations = {
       DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_DB_PASSWORD_SECRET";
       ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
@@ -104,22 +102,21 @@ in
   services.op-energy-offer-service = {
     enable = true;
     db_name = "openergyoffer";
-    db_user = "openergy";
-    db_psk = op-energy-db-psk-mainnet;
+    db_user = "openergyoffer";
+    credentials_locations = {
+      DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_OFFER_DB_PASSWORD_SECRET";
+      INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+    };
     config = ''
-      {
         "DB_PORT": 5432,
         "DB_HOST": "127.0.0.1",
         "DB_USER": "openergy",
         "DB_NAME": "openergyoffer",
-        "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
         "API_HTTP_PORT": 8909,
         "PROMETHEUS_PORT": 7909,
         "LOG_LEVEL_MIN": "Debug",
         "SCHEDULER_POLL_RATE_SECS": 60,
         "ACCOUNT_SERVICE_API_URL": "http://127.0.0.1:8899",
-        "INTERNAL_SERVICE_SHARED_SECRET": "${op-energy-internal-service-shared-secret}"
-      }
     '';
   };
 
