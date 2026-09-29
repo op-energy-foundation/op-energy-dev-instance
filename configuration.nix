@@ -42,6 +42,14 @@
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCl3sFieaXO8pLDGxvpPt3Erx0fgQyFuLkDSIfSdklGtM0UxPmmarSKnSzaVgdEHRfJqcPUxkA+43Wba+j84wqmnPVuHX7IpiZh4gzpfcE2xuBrgh7fwerVCexq7wZhQRcBCMfjE6f0Qvrgpmj5+2Uax1ngL+LE8Mqr6dJJlHhVN27/wx9XcQM1+Z+P5NfbDhhvGNEzRILYrbujqZFEAQlO5wTVRCVhGv8ma45jjVCcl5EvRn0OLHlOkesU8tlqpbfKmAFY5CPrGnu6h2Hu83LtpXmobLKWolATkayYr8hvgB+Mgw6jLqRfh4l+BPDvQ7WdsSAeIFzmEUWKWkgg316Y4tJxTX2iKJzZo7dZh391iF5adVvst93fcCF8S7js/tPHdhqFPEgq89HsNHf46RLtTqJBpT9YFOJuLgO+p307+wmpR2k1LCxi6Yovr9EKqGArXrDMogUmdtr6A+VQgXtA2qTtVZX600PsVV/mFCtcthlTO6uGhxpzH1apDs1rPPbYmUfdF1P5YVF97MWIwqYfDwUDgtl7UQqaUNYI2ufuX4xmA+5vm5mJ3HFWdbjYR27yiAv5I2jccd0YqrGyLm+vwoTC19SVNC6WnUZRxx0pRZX6JSeu4GaLa3lBKHdqfq9BsjJ6H4GbBCxNiR4XqKv/qAe5C10VejyBIk17IGO3rQ== erik@velascommerce.com" # 2025.11.19
       ];
     };
+    andrea = {
+      isNormalUser = true;
+      createHome = true;
+      extraGroups = [ ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHwQHpLtgX4SqHq+ahPaAHB2OMWmAiOEyDWNaRRTHwkE"; # 2026-09-30
+      ];
+    };
 
     root.openssh.authorizedKeys.keys = [
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFsWtJfIRIeSTZBlALW13bGt6wHX1pQtqXuzImHyOZkyPxL/kWaSQW+KGpzeWpwh3qq6LFbEvOOEoSYU38s7pJvuxcB36Q1DDGbMSM2RHJmwsMtzcSDG76eXKuMaRuM6ELtZELryLnsWcQdqkE/ZH3cMrCrFOT59vcVcOaTjxDRaPh4xrzfz2wJle86rmNhG1mY8J0qgCpa4ckBvgOLTSqgP5wi5BBNBDw7FqZe6lz9UhfwPr+tYap1eX0iCDxyl3h+rVd0emErLghBoHFi6riSslIq0dW2W/399j+dNEUD9ok+pmNPDjfw6wQeLzJ3XO0GKhA4c6Lg5PJQExeHVs3tudx9GpB1iYCxeCvqoRameDDIOkF8JfWjRiCy4i4D6kFp+e3bfkKTC9/u8OOKdVKSCi128TsKx0QpOXJ5fisu17JmsFpJh6mF/8k8HkdaEOMPmy3DxRnkKNJpOeib6WHjPpfR7sL5Ahb5xiz/qFUlTTGhaAKqFqziZdY+mMDdSJpqT5AwqMriu3RsJALBHa9r8/EnmkEjiTnAFP6drSaCYr25OWf9EjBrMBlXYpYd0A8vqGxPVxKNoEEuKlZZcaRetAxi13GZnTssPSpraVqZa7FvG+9r2WNYemfnIAuBnGSn9QENPKS4jv68u/3St/olOLtFJubmXX06tfWfn1rSQ== root@op-energy-dev" # CI user

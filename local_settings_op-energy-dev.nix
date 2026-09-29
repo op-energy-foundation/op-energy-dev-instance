@@ -54,7 +54,6 @@ in
     local_settings_lnbits_instance
   ];
 
-  users.users.nginx.extraGroups = [ "acme" ];
   security.acme = {
     acceptTerms = true;
     defaults.email = "ice.redmine+oe+acme@gmail.com";
@@ -126,12 +125,14 @@ in
     443 # ssl backed service
   ];
   users.users = {
+    nginx.extraGroups = [ "acme" ];
     erik = {
       extraGroups = [ "wheel" ];
     };
     naimish = {
       extraGroups = [ "wheel" ];
     };
+    andrea.extraGroups = [ "wheel" ];
   };
   system.stateVersion = "22.05";
 }
