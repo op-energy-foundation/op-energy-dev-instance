@@ -1,7 +1,5 @@
 env@{
   bitcoind-signet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt")
-, bitcoind-signet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-psk.txt")
-, litd_ui_password ? builtins.readFile ( "/etc/nixos/private/litd_ui_password.txt")
 , ...
 }:
 args@{
@@ -62,8 +60,10 @@ in
     enable = true;
     bitcoin_network = "signet";
     bitcoin_user = "sop-energy";
-    bitcoin_pass = bitcoind-signet-rpc-psk;
     lnd_external_ip = config.services.nginx.virtualHosts.op-energy-mvp.serverName;
-    litd_ui_password = litd_ui_password;
+    credentials_locations = {
+      BTC_PASSWORD_SECRET = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_MAINNET_BTC_PASSWORD_SECRET";
+      LITD_UI_PASSWORD_SECRET = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
+    };
   };
 }

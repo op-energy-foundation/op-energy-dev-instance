@@ -2,6 +2,54 @@ args@{ pkgs, lib, config, ...}:
 
 let
   cfg = config.services.litd_terminal_service;
+  # lit.conf is rendered with placeholder tokens (LITD_UI_PASSWORD_SECRET, BTC_PASSWORD_SECRET)
+  # that are replaced with the real values from $CREDENTIALS_DIRECTORY at runtime,
+  # so the secret values never enter the Nix closure.
+  lit_conf = pkgs.writeText "lit.conf" ''
+    # Application Options
+    insecure-httplisten=${cfg.insecure-httplisten}
+    uipassword=LITD_UI_PASSWORD_SECRET
+    #httpslisten=0.0.0.0:8443
+    #tlscertpath=~/.lit/tls.cert
+    #tlskeypath=~/.lit/tls.key
+    #letsencrypt=true
+    #letsencrypthost=loop.merchant.com
+    lnd-mode=integrated
+    network=${cfg.bitcoin_network}
+
+    # Lnd
+    lnd.lnddir=~/.lnd
+    lnd.alias=merchant
+    lnd.externalip=${cfg.lnd_external_ip}
+    lnd.rpclisten=${cfg.lnd_rpc_host_port}
+    lnd.listen=${cfg.lnd_host_port}
+    lnd.debuglevel=debug
+
+    # Lnd - bitcoin
+    lnd.bitcoin.node=bitcoind
+
+    # Lnd - bitcoind
+    lnd.bitcoind.rpchost=${cfg.bitcoin_host}
+    lnd.bitcoind.rpcuser=${cfg.bitcoin_user}
+    lnd.bitcoind.rpcpass=BTC_PASSWORD_SECRET
+    lnd.bitcoind.zmqpubrawblock=localhost:28332
+    lnd.bitcoind.zmqpubrawtx=localhost:28333
+
+    # Loop
+    loop.loopoutmaxparts=5
+
+    # Pool
+    pool.newnodesonly=true
+
+    # Faraday
+    faraday.min_monitored=48h
+
+    # Faraday - bitcoin
+    faraday.connect_bitcoin=true
+    faraday.bitcoin.host=${cfg.bitcoin_host}
+    faraday.bitcoin.user=${cfg.bitcoin_user}
+    faraday.bitcoin.password=BTC_PASSWORD_SECRET
+  '';
 in
 {
   options.services.litd_terminal_service = {
@@ -16,11 +64,17 @@ in
       '';
     };
 
-    litd_ui_password = lib.mkOption {
-      type = lib.types.str;
-      example = "pwd";
+    credentials_locations = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = {
+        BTC_PASSWORD_SECRET = "/etc/nixos/private/BTC_PASSWORD_SECRET";
+        LITD_UI_PASSWORD_SECRET = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
+      };
       description = ''
-        defines LND UI password
+        Maps var->secret_file for systemd-credentials.
+        The files are loaded via LoadCredential and substituted into lit.conf at runtime,
+        so the secret values never enter the Nix closure.
       '';
     };
 
@@ -69,14 +123,6 @@ in
       '';
     };
 
-    bitcoin_pass = lib.mkOption {
-      type = lib.types.str;
-      example = "pwd";
-      description = ''
-        defines bitcoind user's password to connect to bitcoin node with
-      '';
-    };
-
     lnd_external_ip = lib.mkOption {
       type = lib.types.str;
       example = "2.2.2.2";
@@ -95,54 +141,6 @@ in
       createHome = true;
     };
     users.groups.litd = { };
-    environment.etc."lit/lit.conf" = {
-      mode = "0600";
-      text = ''
-        # Application Options
-        insecure-httplisten=${cfg.insecure-httplisten}
-        uipassword=${cfg.litd_ui_password}
-        #httpslisten=0.0.0.0:8443
-        #tlscertpath=~/.lit/tls.cert
-        #tlskeypath=~/.lit/tls.key
-        #letsencrypt=true
-        #letsencrypthost=loop.merchant.com
-        lnd-mode=integrated
-        network=${cfg.bitcoin_network}
-
-        # Lnd
-        lnd.lnddir=~/.lnd
-        lnd.alias=merchant
-        lnd.externalip=${cfg.lnd_external_ip}
-        lnd.rpclisten=${cfg.lnd_rpc_host_port}
-        lnd.listen=${cfg.lnd_host_port}
-        lnd.debuglevel=debug
-
-        # Lnd - bitcoin
-        lnd.bitcoin.node=bitcoind
-
-        # Lnd - bitcoind
-        lnd.bitcoind.rpchost=${cfg.bitcoin_host}
-        lnd.bitcoind.rpcuser=${cfg.bitcoin_user}
-        lnd.bitcoind.rpcpass=bitcoind-signet-rpc-psk
-        lnd.bitcoind.zmqpubrawblock=localhost:28332
-        lnd.bitcoind.zmqpubrawtx=localhost:28333
-
-        # Loop
-        loop.loopoutmaxparts=5
-
-        # Pool
-        pool.newnodesonly=true
-
-        # Faraday
-        faraday.min_monitored=48h
-
-        # Faraday - bitcoin
-        faraday.connect_bitcoin=true
-        faraday.bitcoin.host=${cfg.bitcoin_host}
-        faraday.bitcoin.user=${cfg.bitcoin_user}
-        faraday.bitcoin.password=bitcoind-signet-rpc-psk
-      '';
-    };
 
     environment.systemPackages = with pkgs;
       [ lightning-terminal
@@ -154,10 +152,8 @@ in
       serviceConfig = {
         Type = "simple";
         LoadCredential =
-          # TODO: function: key:dir:file -> "key:dir/file"
-          [ "lit.conf:/etc/lit/lit.conf"
-            "bitcoind-signet-rpc-psk:/etc/nixos/private/bitcoind-signet-rpc-psk.txt"
-            "litd_ui_password:/etc/nixos/private/litd_ui_password.txt"
+          [ "BTC_PASSWORD_SECRET:${cfg.credentials_locations.BTC_PASSWORD_SECRET}"
+            "LITD_UI_PASSWORD_SECRET:${cfg.credentials_locations.LITD_UI_PASSWORD_SECRET}"
           ];
         User = "litd";
         Group = "litd";
@@ -170,10 +166,9 @@ in
        set -e
        rm ~/.lit/lit.conf || true
        mkdir -p ~/.lit || true
-       cp $CREDENTIALS_DIRECTORY/lit.conf ~/.lit/lit.conf
-       # TODO: function: key:dir:file -> sed -i "s/key/$(cat dir/file"
-       sed -i "s/bitcoind-signet-rpc-psk/$(cat $CREDENTIALS_DIRECTORY/bitcoind-signet-rpc-psk)/g" ~/.lit/lit.conf
-       sed -i "s/litd_ui_password/$(cat $CREDENTIALS_DIRECTORY/litd_ui_password)/g" ~/.lit/lit.conf
+       cp ${lit_conf} ~/.lit/lit.conf
+       sed -i "s|BTC_PASSWORD_SECRET|$(cat $CREDENTIALS_DIRECTORY/BTC_PASSWORD_SECRET)|g" ~/.lit/lit.conf
+       sed -i "s|LITD_UI_PASSWORD_SECRET|$(cat $CREDENTIALS_DIRECTORY/LITD_UI_PASSWORD_SECRET)|g" ~/.lit/lit.conf
        litd
       '';
 
