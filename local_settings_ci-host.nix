@@ -11,6 +11,8 @@ in
     local_settings_lnbits_instance
   ];
 
+  services.nginx.virtualHosts.op-energy-mvp.serverName = "localhost";
+
   system.stateVersion = "22.05";
 
 }
