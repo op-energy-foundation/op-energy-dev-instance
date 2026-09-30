@@ -10,6 +10,7 @@ args@
 }:
 
 let
+  local_settings_lnbits_instance = import ./local_settings_lnbits_instance.nix env;
   local_settings_development = import ./local_settings_development.nix env;
   GIT_COMMIT_HASH = REPO_LOCATION: if builtins.hasAttr "GIT_COMMIT_HASH" env
     then env.GIT_COMMIT_HASH
@@ -50,9 +51,9 @@ in
 {
   imports = [
     local_settings_development # this instance is development
+    local_settings_lnbits_instance
   ];
 
-  users.users.nginx.extraGroups = [ "acme" ];
   security.acme = {
     acceptTerms = true;
     defaults.email = "ice.redmine+oe+acme@gmail.com";
@@ -94,18 +95,44 @@ in
     };
   };
 
+  # TODO: replace with something more reliable
+  systemd.services = {
+    ssh_tunnel = { # we use ssh tunnel to production instance in order to reuse connection to mainnet node. This service's goal is just to keep ssh tunnel alive all the time
+      wantedBy = [ "multi-user.target" ];
+      before = [ "op-energy-backend-mainnet.service" ];
+      after = [
+        "network-online.target"
+      ];
+      requires = [
+        "network-online.target"
+      ];
+      serviceConfig = {
+        Type = "simple";
+        Restart = "always"; # we want to keep service always running
+        RestartSec = "10s";
+      };
+      path = with pkgs; [
+        openssh
+      ];
+      script = ''
+        ssh proxy@exchange.op-energy.info -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -n "while true; do sleep 10s; done"
+      '';
+    };
+  };
+
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [
     443 # ssl backed service
   ];
-  users.users.erik = {
-    isNormalUser = true;
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCl3sFieaXO8pLDGxvpPt3Erx0fgQyFuLkDSIfSdklGtM0UxPmmarSKnSzaVgdEHRfJqcPUxkA+43Wba+j84wqmnPVuHX7IpiZh4gzpfcE2xuBrgh7fwerVCexq7wZhQRcBCMfjE6f0Qvrgpmj5+2Uax1ngL+LE8Mqr6dJJlHhVN27/wx9XcQM1+Z+P5NfbDhhvGNEzRILYrbujqZFEAQlO5wTVRCVhGv8ma45jjVCcl5EvRn0OLHlOkesU8tlqpbfKmAFY5CPrGnu6h2Hu83LtpXmobLKWolATkayYr8hvgB+Mgw6jLqRfh4l+BPDvQ7WdsSAeIFzmEUWKWkgg316Y4tJxTX2iKJzZo7dZh391iF5adVvst93fcCF8S7js/tPHdhqFPEgq89HsNHf46RLtTqJBpT9YFOJuLgO+p307+wmpR2k1LCxi6Yovr9EKqGArXrDMogUmdtr6A+VQgXtA2qTtVZX600PsVV/mFCtcthlTO6uGhxpzH1apDs1rPPbYmUfdF1P5YVF97MWIwqYfDwUDgtl7UQqaUNYI2ufuX4xmA+5vm5mJ3HFWdbjYR27yiAv5I2jccd0YqrGyLm+vwoTC19SVNC6WnUZRxx0pRZX6JSeu4GaLa3lBKHdqfq9BsjJ6H4GbBCxNiR4XqKv/qAe5C10VejyBIk17IGO3rQ== erik@velascommerce.com" # 2025.11.19
-    ];
-  };
-  users.users.user = {
-    isNormalUser = true;
+  users.users = {
+    nginx.extraGroups = [ "acme" ];
+    erik = {
+      extraGroups = [ "wheel" ];
+    };
+    naimish = {
+      extraGroups = [ "wheel" ];
+    };
+    andrea.extraGroups = [ "wheel" ];
   };
   system.stateVersion = "22.05";
 }

@@ -8,6 +8,7 @@ args@{ pkgs, lib, config, ...}:
 
 let
   local_settings_production = import ./local_settings_production.nix env;
+  local_settings_lnbits_instance = import ./local_settings_lnbits_instance.nix env;
   btc_volume_alert = pkgs.writeText "btc_volume_alert" ''
     groups:
     - name: node.rules
@@ -80,6 +81,7 @@ in
 {
   imports = [
     local_settings_production # this node is production
+    local_settings_lnbits_instance
   ];
 
   system.stateVersion = "22.05";
@@ -218,12 +220,18 @@ in
         );
     };
   };
-  users.users.proxy = {
-    isNormalUser = true;
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCkkpIFU1cyqPiecRarmjfDjZKvYXGj2/Et2Bj1IhwSgNJTaEg6rjdBUd1JubEWOjqg3YPpD/wvQyGZMeIsgpBF8pDwUFa15PQrjLD6UUxW64fUk+N/zDmafI4lKcgA5Y8IXxV0OgCmflrOSIXH3VP9vqxyek4GLpHOPZrrih8B55ByZ5LlCrZ3eX0gonbArHIiMOEnB/eIzhArlw6Ud38Ccr8bJE18U9jON7SkFsbr7zOZKJPwVMLFArMvUr0XmTqbztxXO2vb6UEYCyE5MRDlWiKFnksEg56nrMhFsfpdNShCBv7mxcQA+dbVRPSAmMnWcUCU6cAj0QHHrrbpgbzOxj6kRz359qgM5Gn55p2x54m2kbG/sGhqZNuVO17avLTG+FrgH+xNK3Vl1K1UEqeZfTdwu8FdRCfJX3bRiH9XSPzCSzT7N/8xEOn19NcIOrT+vDBpGwvEHU3hOVag6rq2WrFMjop0lHSxVZUJ5BZsOS5bVBUkUwqXjrD+iIdoZq5uXDR91aiixNNh8YRD632saoy/jByoGyxA/zyAftHsTIdAMZ1mqpIo22JeGYgzsG6EhfnbyNzlBY7dO011zd7q8e0Ju/Ia6c2DNWVLssP6o3Vp9XBQlXH9/f3mbq9XMl+PIXbmZHRuA5GV8QVBTvepXS17MBZeP2LhsiFU6BCVpw== root@build" # dambaev's dev
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7venNAKELBvcIs6ucdRdSM2vOEtBaGS87jgGFnDhdDaICxLsaHrxhsYHKKTrBn5DTWsQ+xDvetV5/9yxZtQUby7AxVF39zAQk9kO3Jt7hkz85n7gWOWIAq3msMTbJQDOzXEZR/Ddpf4jQjEeGgIGYTpKXmY923qog1qQvnuhhYAID2oVTmbT/c4xPvOxWkeDe30ue2/Cl0HQhf6ilSTLAfx6X3WpTVLK+l+xmWLWB/9rmVtJqo/TPuq+cD7DoWTuZ9o+jR1CGafYtH7puxi8mpu6c75D37P5KofE8Ae/jnDAPzzp7APT/bm1uNqsvhEO4dU9wkIDUdXpO48L0mgIrxLlKFnfVe0yWFUns11iqTiw5XDxcIKJVSBjaiCblbJok71746CXF06HwJENNb/Y9Ak+VaezTprThFGESf5fUBpL+I3rHK5CgTZJlf2YS0dWASZCqoda++ocdO6suaIyL9C6yk1yBfnpUt4ePI834iqn6kOiwAYiKAFy4BTfOK3tArX2pOagnjhOij4GhwYassk8WNpUtkOXj1wzpmI0i6fhgvt00YOY07oZnDg6/xg1vx7jFoPIAvzW8HmXUnP3K+aBSq37HBx0zqXvylBsqLE2Mah8c+/YeGMNXE0k4UEU489HpTCY8H0LXa/iHpqfd9SurwbDiQnJy1Q+VCvJJ7Q== root@op-energy-dev" # dev instance
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFsWtJfIRIeSTZBlALW13bGt6wHX1pQtqXuzImHyOZkyPxL/kWaSQW+KGpzeWpwh3qq6LFbEvOOEoSYU38s7pJvuxcB36Q1DDGbMSM2RHJmwsMtzcSDG76eXKuMaRuM6ELtZELryLnsWcQdqkE/ZH3cMrCrFOT59vcVcOaTjxDRaPh4xrzfz2wJle86rmNhG1mY8J0qgCpa4ckBvgOLTSqgP5wi5BBNBDw7FqZe6lz9UhfwPr+tYap1eX0iCDxyl3h+rVd0emErLghBoHFi6riSslIq0dW2W/399j+dNEUD9ok+pmNPDjfw6wQeLzJ3XO0GKhA4c6Lg5PJQExeHVs3tudx9GpB1iYCxeCvqoRameDDIOkF8JfWjRiCy4i4D6kFp+e3bfkKTC9/u8OOKdVKSCi128TsKx0QpOXJ5fisu17JmsFpJh6mF/8k8HkdaEOMPmy3DxRnkKNJpOeib6WHjPpfR7sL5Ahb5xiz/qFUlTTGhaAKqFqziZdY+mMDdSJpqT5AwqMriu3RsJALBHa9r8/EnmkEjiTnAFP6drSaCYr25OWf9EjBrMBlXYpYd0A8vqGxPVxKNoEEuKlZZcaRetAxi13GZnTssPSpraVqZa7FvG+9r2WNYemfnIAuBnGSn9QENPKS4jv68u/3St/olOLtFJubmXX06tfWfn1rSQ== root@op-energy-dev" # dev instance
-    ];
+  users.users = {
+    naimish = {
+      extraGroups = [ "wheel" ];
+    };
+    erik = {
+      extraGroups = [ "wheel" ];
+    };
+    proxy = {
+      isNormalUser = true;
+      openssh.authorizedKeys.keys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFsWtJfIRIeSTZBlALW13bGt6wHX1pQtqXuzImHyOZkyPxL/kWaSQW+KGpzeWpwh3qq6LFbEvOOEoSYU38s7pJvuxcB36Q1DDGbMSM2RHJmwsMtzcSDG76eXKuMaRuM6ELtZELryLnsWcQdqkE/ZH3cMrCrFOT59vcVcOaTjxDRaPh4xrzfz2wJle86rmNhG1mY8J0qgCpa4ckBvgOLTSqgP5wi5BBNBDw7FqZe6lz9UhfwPr+tYap1eX0iCDxyl3h+rVd0emErLghBoHFi6riSslIq0dW2W/399j+dNEUD9ok+pmNPDjfw6wQeLzJ3XO0GKhA4c6Lg5PJQExeHVs3tudx9GpB1iYCxeCvqoRameDDIOkF8JfWjRiCy4i4D6kFp+e3bfkKTC9/u8OOKdVKSCi128TsKx0QpOXJ5fisu17JmsFpJh6mF/8k8HkdaEOMPmy3DxRnkKNJpOeib6WHjPpfR7sL5Ahb5xiz/qFUlTTGhaAKqFqziZdY+mMDdSJpqT5AwqMriu3RsJALBHa9r8/EnmkEjiTnAFP6drSaCYr25OWf9EjBrMBlXYpYd0A8vqGxPVxKNoEEuKlZZcaRetAxi13GZnTssPSpraVqZa7FvG+9r2WNYemfnIAuBnGSn9QENPKS4jv68u/3St/olOLtFJubmXX06tfWfn1rSQ== root@op-energy-dev" # dev instance
+      ];
+    };
   };
 }
