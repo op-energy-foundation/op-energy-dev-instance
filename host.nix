@@ -6,6 +6,7 @@ env@{
 , OP_ENERGY_FRONTEND_MVP_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-mvp
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
 , OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-api-swagger-ui
+, OP_ENERGY_LN_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-ln
   # import psk from out-of-git file
 , bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
 , op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
@@ -39,6 +40,8 @@ let
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyOfferServiceModule = import ./overlays/op-energy/oe-offer-service/op-energy-offer-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyApiSwaggerUIModule = import ./overlays/op-energy-api-swagger-ui/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION; };
+  opEnergyLitdModule = import ./overlays/op-energy-ln/litd/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
+  opEnergyLnbitsModule = import ./overlays/op-energy-ln/lnbits/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
   local_settings = import ./local_settings.nix env;
 in
 {
@@ -52,6 +55,8 @@ in
     opEnergyAccountServiceModule
     opEnergyOfferServiceModule
     opEnergyApiSwaggerUIModule
+    opEnergyLitdModule
+    opEnergyLnbitsModule
   ];
   system.stateVersion = "22.05";
 

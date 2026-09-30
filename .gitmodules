@@ -19,3 +19,7 @@
 [submodule "overlays/op-energy-api-swagger-ui"]
 	path = overlays/op-energy-api-swagger-ui
 	url = ssh://git@github.com/op-energy-foundation/op-energy-api-swagger-ui.git
+[submodule "overlays/op-energy-ln"]
+	path = overlays/op-energy-ln
+	url = ssh://git@github.com/op-energy-foundation/op-energy-ln
+	branch = main
