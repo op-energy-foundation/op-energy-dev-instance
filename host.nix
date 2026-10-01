@@ -163,6 +163,7 @@ in
     network = "signet";
     uiPasswordFile = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
     walletUnlockPasswordFile = "/etc/nixos/private/LITD_WALLET_UNLOCK_PASSWORD";
+    walletUnlockAllowCreate = true;
     groupReadableCredentials = true;
     requires = [ "bitcoind-signet.service" ];
     bitcoind.rpcPasswordFile = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_SIGNET_BTC_PASSWORD_SECRET";
@@ -182,6 +183,8 @@ in
     tcpdump # traffic sniffer
     iftop # network usage monitor
     git
+    config.services.litd.package
+    lnd
   ];
 
   # Enable the OpenSSH daemon.
