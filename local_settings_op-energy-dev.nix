@@ -10,7 +10,6 @@ args@
 }:
 
 let
-  local_settings_lnbits_instance = import ./local_settings_lnbits_instance.nix env;
   local_settings_development = import ./local_settings_development.nix env;
   GIT_COMMIT_HASH = REPO_LOCATION: if builtins.hasAttr "GIT_COMMIT_HASH" env
     then env.GIT_COMMIT_HASH
@@ -51,7 +50,6 @@ in
 {
   imports = [
     local_settings_development # this instance is development
-    local_settings_lnbits_instance
   ];
 
   security.acme = {
