@@ -164,7 +164,7 @@ in
     uiPasswordFile = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
     # walletUnlockPasswordFile = "/etc/nixos/private/LITD_WALLET_UNLOCK_PASSWORD";
     # walletUnlockAllowCreate = true;
-    noSeedBackup = true;
+    # noSeedBackup = true;
     groupReadableCredentials = true;
     requires = [ "bitcoind-signet.service" ];
     bitcoind.rpcPasswordFile = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_SIGNET_BTC_PASSWORD_SECRET";
