@@ -162,8 +162,8 @@ in
     enable = true;
     network = "signet";
     uiPasswordFile = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
-    # walletUnlockPasswordFile = "/etc/nixos/private/LITD_WALLET_UNLOCK_PASSWORD";
-    # walletUnlockAllowCreate = true;
+    walletUnlockPasswordFile = "/etc/nixos/private/LITD_WALLET_UNLOCK_PASSWORD";
+    walletUnlockAllowCreate = true;
     # noSeedBackup = true;
     groupReadableCredentials = true;
     requires = [ "bitcoind-signet.service" ];
