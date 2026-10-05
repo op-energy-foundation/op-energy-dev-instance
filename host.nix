@@ -166,6 +166,7 @@ in
     walletUnlockAllowCreate = true;
     groupReadableCredentials = true;
     requires = [ "bitcoind-signet.service" ];
+    bitcoind.rpcUser = "sop-energy";
     bitcoind.rpcPasswordFile = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_SIGNET_BTC_PASSWORD_SECRET";
   };
 
