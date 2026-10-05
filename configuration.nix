@@ -47,7 +47,7 @@
       createHome = true;
       extraGroups = [ ];
       openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHwQHpLtgX4SqHq+ahPaAHB2OMWmAiOEyDWNaRRTHwkE"; # 2026-09-30
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHwQHpLtgX4SqHq+ahPaAHB2OMWmAiOEyDWNaRRTHwkE" # 2026-09-30
       ];
     };
 
