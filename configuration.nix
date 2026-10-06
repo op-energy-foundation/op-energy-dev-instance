@@ -8,6 +8,9 @@
   boot.tmp.cleanOnBoot = true;
   networking.firewall.allowPing = true;
   services.openssh.enable = true;
+  security.pam.sshAgentAuth.enable = true;        # enable sudo through SSH-agent
+  security.pam.services.sudo.sshAgentAuth = true; #
+
   environment.systemPackages = [ pkgs.vim ];
   users.users = {
     thomas = {
