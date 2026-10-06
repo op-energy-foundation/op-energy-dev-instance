@@ -7,11 +7,6 @@ env@{
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
 , OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-api-swagger-ui
   # import psk from out-of-git file
-, bitcoind-mainnet-rpc-psk ? builtins.readFile ( "/etc/nixos/private/bitcoind-mainnet-rpc-psk.txt")
-, op-energy-db-psk-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-psk-mainnet.txt")
-, op-energy-db-salt-mainnet ? builtins.readFile ( "/etc/nixos/private/op-energy-db-salt-mainnet.txt")
-, op-energy-account-token-encryption-key ? builtins.readFile ( "/etc/nixos/private/op-energy-account-token-encryption-key.txt")
-, op-energy-internal-service-shared-secret ? builtins.readFile ( "/etc/nixos/private/op-energy-internal-service-shared-secret.txt")
 , ...
 }:
 args@{ pkgs, lib, config, ...}:
@@ -63,71 +58,60 @@ in
       in {
       db_user = "openergy";
       db_name = db;
-      db_psk = op-energy-db-psk-mainnet;
-      account_db_name = "${db}acc";
-      config = ''
-        {
-          "DB_PORT": 5432,
-          "DB_HOST": "127.0.0.1",
-          "DB_USER": "${db}",
-          "DB_NAME": "${db}",
-          "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
-          "SECRET_SALT": "${op-energy-db-salt-mainnet}",
-          "API_HTTP_PORT": 8999,
-          "BTC_URL": "http://127.0.0.1:8332",
-          "BTC_USER": "op-energy",
-          "BTC_PASSWORD": "${bitcoind-mainnet-rpc-psk}",
-          "BTC_POLL_RATE_SECS": 10,
-          "PROMETHEUS_PORT": 7999,
-          "SCHEDULER_POLL_RATE_SECS": 10
-        }
-      '';
+      credentials_locations = {
+        BTC_PASSWORD_SECRET = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_MAINNET_BTC_PASSWORD_SECRET";
+        DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_MAINNET_DB_PASSWORD_SECRET";
+      };
+      extraConfig = {
+        DB_PORT = 5432;
+        DB_HOST = "127.0.0.1";
+        API_HTTP_PORT = 8999;
+        BTC_URL = "http://127.0.0.1:8332";
+        BTC_USER = "op-energy";
+        BTC_POLL_RATE_SECS = 10;
+        PROMETHEUS_PORT = 7999;
+        SCHEDULER_POLL_RATE_SECS = 10;
+      };
     };
   };
 
   services.op-energy-account-service = {
     enable = true;
     db_name = "openergyacc";
-    db_user = "openergy";
-    db_psk = op-energy-db-psk-mainnet;
-    config = ''
-      {
-        "DB_PORT": 5432,
-        "DB_HOST": "127.0.0.1",
-        "DB_USER": "openergy",
-        "DB_NAME": "openergyacc",
-        "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
-        "SECRET_SALT": "${op-energy-db-salt-mainnet}",
-        "ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY": "${op-energy-account-token-encryption-key}",
-        "API_HTTP_PORT": 8899,
-        "PROMETHEUS_PORT": 7899,
-        "LOG_LEVEL_MIN": "Debug",
-        "SCHEDULER_POLL_RATE_SECS": 10,
-        "INTERNAL_SERVICE_SHARED_SECRET": "${op-energy-internal-service-shared-secret}"
-      }
-    '';
+    db_user = "openergyacc";
+    credentials_locations = {
+      DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_DB_PASSWORD_SECRET";
+      ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
+      INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+      SECRET_SALT_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_SECRET_SALT_SECRET";
+    };
+    extraConfig = {
+      DB_PORT = 5432;
+      DB_HOST = "127.0.0.1";
+      API_HTTP_PORT = 8899;
+      PROMETHEUS_PORT = 7899;
+      LOG_LEVEL_MIN = "Debug";
+      SCHEDULER_POLL_RATE_SECS = 10;
+    };
   };
 
   services.op-energy-offer-service = {
     enable = true;
     db_name = "openergyoffer";
-    db_user = "openergy";
-    db_psk = op-energy-db-psk-mainnet;
-    config = ''
-      {
-        "DB_PORT": 5432,
-        "DB_HOST": "127.0.0.1",
-        "DB_USER": "openergy",
-        "DB_NAME": "openergyoffer",
-        "DB_PASSWORD": "${op-energy-db-psk-mainnet}",
-        "API_HTTP_PORT": 8909,
-        "PROMETHEUS_PORT": 7909,
-        "LOG_LEVEL_MIN": "Debug",
-        "SCHEDULER_POLL_RATE_SECS": 60,
-        "ACCOUNT_SERVICE_API_URL": "http://127.0.0.1:8899",
-        "INTERNAL_SERVICE_SHARED_SECRET": "${op-energy-internal-service-shared-secret}"
-      }
-    '';
+    db_user = "openergyoffer";
+    credentials_locations = {
+      DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_OFFER_DB_PASSWORD_SECRET";
+      INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+    };
+    extraConfig = {
+      DB_PORT = 5432;
+      DB_HOST = "127.0.0.1";
+      API_HTTP_PORT = 8909;
+      PROMETHEUS_PORT = 7909;
+      LOG_LEVEL_MIN = "Debug";
+      SCHEDULER_POLL_RATE_SECS = 60;
+      ACCOUNT_SERVICE_API_URL = "http://127.0.0.1:8899";
+    };
   };
 
   services.op-energy-api-swagger-ui = {
