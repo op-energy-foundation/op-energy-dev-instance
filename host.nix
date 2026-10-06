@@ -6,7 +6,9 @@ env@{
 , OP_ENERGY_FRONTEND_MVP_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-mvp
 , OP_ENERGY_ACCOUNT_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy
 , OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-api-swagger-ui
+, OP_ENERGY_LN_REPO_LOCATION ? /etc/nixos/.git/modules/overlays/op-energy-ln
   # import psk from out-of-git file
+, bitcoind-signet-rpc-pskhmac ? builtins.readFile ( "/etc/nixos/private/bitcoind-signet-rpc-pskhmac.txt")
 , ...
 }:
 args@{ pkgs, lib, config, ...}:
@@ -34,6 +36,8 @@ let
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyOfferServiceModule = import ./overlays/op-energy/oe-offer-service/op-energy-offer-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyApiSwaggerUIModule = import ./overlays/op-energy-api-swagger-ui/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION; };
+  opEnergyLITDModule = import ./overlays/op-energy-ln/litd/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
+  opEnergyLNBITSModule = import ./overlays/op-energy-ln/lnbits/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
   local_settings = import ./local_settings.nix env;
 in
 {
@@ -47,6 +51,8 @@ in
     opEnergyAccountServiceModule
     opEnergyOfferServiceModule
     opEnergyApiSwaggerUIModule
+    opEnergyLITDModule
+    opEnergyLNBITSModule
   ];
   system.stateVersion = "22.05";
 
@@ -129,6 +135,47 @@ in
     enable = true;
   };
 
+  services.bitcoind = {
+    signet = {
+      enable = true;
+      extraCmdlineOptions = [ "-signet" ];
+      extraConfig = ''
+        [signet]
+        txindex = 1
+        server=1
+        listen=1
+        discover=1
+        rpcallowip=127.0.0.1/32
+        rpcbind=127.0.0.1
+        zmqpubrawblock=tcp://127.0.0.1:28332
+        zmqpubrawtx=tcp://127.0.0.1:28333
+      '';
+      rpc.users = {
+        op-energy = {
+          name = "sop-energy";
+          passwordHMAC = "${bitcoind-signet-rpc-pskhmac}";
+        };
+      };
+    };
+  };
+  services.litd = {
+    enable = true;
+    network = "signet";
+    uiPasswordFile = "/etc/nixos/private/LITD_UI_PASSWORD_SECRET";
+    walletUnlockPasswordFile = "/etc/nixos/private/LITD_WALLET_UNLOCK_PASSWORD";
+    walletUnlockAllowCreate = true;
+    groupReadableCredentials = true;
+    requires = [ "bitcoind-signet.service" ];
+    bitcoind.rpcUser = "sop-energy";
+    bitcoind.rpcPasswordFile = "/etc/nixos/private/OP_ENERGY_BLOCKSPANS_SIGNET_BTC_PASSWORD_SECRET";
+  };
+
+  services.lnbits = {
+    enable = true;
+    firstInstallTokenFile = "/etc/nixos/private/LNBITS_FIRST_INSTALL_TOKEN";
+  };
+
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -137,6 +184,8 @@ in
     tcpdump # traffic sniffer
     iftop # network usage monitor
     git
+    config.services.litd.package
+    lnd
   ];
 
   # Enable the OpenSSH daemon.
