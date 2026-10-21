@@ -90,6 +90,8 @@ in
       ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
       INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
       SECRET_SALT_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_SECRET_SALT_SECRET";
+      LNBITS_INVOICE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_INVOICE_KEY";
+      LNBITS_ADMIN_KEY_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_ADMIN_KEY";
     };
     extraConfig = {
       DB_PORT = 5432;
@@ -98,6 +100,8 @@ in
       PROMETHEUS_PORT = 7899;
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 10;
+      WALLET_BACKEND = "lnbits";
+      LNBITS_API_URL = "https://demo.lnbits.com";
     };
   };
 
