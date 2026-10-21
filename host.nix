@@ -98,6 +98,7 @@ in
       PROMETHEUS_PORT = 7899;
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 10;
+      WALLET_BACKEND = "mock";
     };
   };
 
