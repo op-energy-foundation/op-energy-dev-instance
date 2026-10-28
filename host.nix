@@ -123,12 +123,6 @@ in
   services.op-energy-api-swagger-ui = {
     enable = true;
   };
-  services.nginx = {
-    virtualHosts = {
-      op-energy = pkgs.op-energy-api-swagger-ui-nginx-vhost-config
-        {config = config;} "/" "http://127.0.0.1:8998";
-    };
-  };
 
   # enable op-energy-frontend service
   services.op-energy-frontend = {
