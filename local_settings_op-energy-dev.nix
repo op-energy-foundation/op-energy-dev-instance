@@ -73,13 +73,13 @@ in
   services.nginx = {
     virtualHosts = {
       op-energy = {
-        serverName = "dev-exchange.op.energy";
+        serverName = "op-energy"; # TODO: decide if we need old frontend at all now?
         forceSSL = true;
         useACMEHost = "dev-exchange.op.energy";
       };
       op-energy-mvp = lib.recursiveUpdate
         {
-          serverName = "dev-exchange.op-energy.info";
+          serverName = "dev-exchange.op.energy";
           forceSSL = true;
           useACMEHost = "dev-exchange.op.energy";
         }
