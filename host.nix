@@ -101,7 +101,9 @@ in
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 10;
       WALLET_BACKEND = "lnbits";
-      LNBITS_API_URL = "https://demo.lnbits.com";
+      # this host's own LNbits (services.lnbits below): the account service
+      # reaches it over loopback, so the API keys never leave the machine
+      LNBITS_API_URL = "http://127.0.0.1:8231";
     };
   };
 
