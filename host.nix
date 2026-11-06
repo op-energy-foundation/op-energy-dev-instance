@@ -90,6 +90,8 @@ in
       ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
       INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
       SECRET_SALT_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_SECRET_SALT_SECRET";
+      LNBITS_INVOICE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_INVOICE_KEY";
+      LNBITS_ADMIN_KEY_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_ADMIN_KEY";
     };
     extraConfig = {
       DB_PORT = 5432;
@@ -98,6 +100,15 @@ in
       PROMETHEUS_PORT = 7899;
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 10;
+      WALLET_BACKEND = "lnbits";
+      # this host's own LNbits (services.lnbits below): the account service
+      # reaches it over loopback, so the API keys never leave the machine
+      LNBITS_API_URL = "http://127.0.0.1:8231";
+      # the service refuses to start with a starting balance and a real
+      # wallet together: every account would be credited sats nobody paid
+      # in, and could withdraw them and register again for more. It stays
+      # at nothing until the free sats work is on master
+      STARTING_BALANCE_SATS = 0;
     };
   };
 
