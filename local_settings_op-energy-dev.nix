@@ -113,7 +113,7 @@ in
         openssh
       ];
       script = ''
-        ssh proxy@exchange.op-energy.info -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -n "while true; do sleep 10s; done"
+        ssh proxy@exchange.op.energy -L8332:127.0.0.1:8332 -oServerAliveInterval=60 -oStrictHostKeyChecking=accept-new -n "while true; do sleep 10s; done"
       '';
     };
   };
