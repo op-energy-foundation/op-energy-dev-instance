@@ -202,12 +202,14 @@ in
         serverName = "op-energy"; # TODO: decide if we need old frontend at all now?
         forceSSL = true;
         useACMEHost = "op.energy";
+        http2 = false; # waiting for the upstream version update
       };
       op-energy-mvp = lib.recursiveUpdate
         {
           serverName = "op.energy";
           forceSSL = true;
           useACMEHost = "op.energy";
+          http2 = false; # waiting for the upstream version update
         }
         ( lib.recursiveUpdate
           (op-energy-frontend-prototype-subroute "/prototype")
