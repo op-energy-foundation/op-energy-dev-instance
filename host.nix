@@ -104,11 +104,15 @@ in
       # this host's own LNbits (services.lnbits below): the account service
       # reaches it over loopback, so the API keys never leave the machine
       LNBITS_API_URL = "http://127.0.0.1:8231";
-      # the service refuses to start with a starting balance and a real
-      # wallet together: every account would be credited sats nobody paid
-      # in, and could withdraw them and register again for more. It stays
-      # at nothing until the free sats work is on master
-      STARTING_BALANCE_SATS = 0;
+      # every account is credited this at registration, out of the wallet
+      # named above like any other balance, and an account is free to
+      # create. The service no longer refuses the two together -- the
+      # check, which did, was dropped so a tester can trade without being
+      # paid in first -- so this is the deployment saying it is content
+      # for the sats to be given away. It holds while that wallet is
+      # signet, where they cost nothing, and goes to 0 before it is
+      # pointed at a wallet whose sats are worth something
+      STARTING_BALANCE_SATS = 300000;
     };
   };
 
