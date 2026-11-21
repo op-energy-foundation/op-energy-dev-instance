@@ -31,13 +31,29 @@ let
     );
   opEnergyFrontendModule = import ./overlays/op-energy-frontend/frontend/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_REPO_LOCATION; };
   opEnergyFrontendPrototypeModule = import ./overlays/op-energy-prototype/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION; };
-  opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION; };
+  opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix {
+    GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION;
+    TELEGRAM_INVITE_URL = telegramInviteURL;
+    TELEGRAM_BOT_NAME = telegramBotName;
+  };
   opEnergyBackendModule = import ./overlays/op-energy-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyOfferServiceModule = import ./overlays/op-energy/oe-offer-service/op-energy-offer-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyApiSwaggerUIModule = import ./overlays/op-energy-api-swagger-ui/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION; };
   opEnergyLITDModule = import ./overlays/op-energy-ln/litd/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
   opEnergyLNBITSModule = import ./overlays/op-energy-ln/lnbits/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
+  # read from a file outside git: host.nix is the same on every instance,
+  # and dev and production mirror different telegram groups. Absent, the
+  # setting is not set at all and the chat is simply off
+  privateSetting = name:
+    let path = "/etc/nixos/private/" + name;
+    in if builtins.pathExists path
+       then lib.strings.removeSuffix "\n" (builtins.readFile path)
+       else "";
+  telegramChatId = privateSetting "TELEGRAM_CHAT_ID";
+  telegramInviteURL = privateSetting "TELEGRAM_INVITE_URL";
+  telegramBotName = privateSetting "TELEGRAM_BOT_NAME";
+
   local_settings = import ./local_settings.nix env;
 in
 {
@@ -123,6 +139,10 @@ in
     credentials_locations = {
       DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_OFFER_DB_PASSWORD_SECRET";
       INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+    } // lib.optionalAttrs (telegramChatId != "") {
+      # named only where there is a group to follow: systemd refuses to
+      # start a unit whose credential file is missing
+      TELEGRAM_BOT_TOKEN_SECRET = "/etc/nixos/private/TELEGRAM_BOT_TOKEN_SECRET";
     };
     extraConfig = {
       DB_PORT = 5432;
@@ -132,6 +152,9 @@ in
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 60;
       ACCOUNT_SERVICE_API_URL = "http://127.0.0.1:8899";
+    } // lib.optionalAttrs (telegramChatId != "") {
+      # fromJSON rather than toInt: a supergroup's id is negative
+      TELEGRAM_CHAT_ID = builtins.fromJSON telegramChatId;
     };
   };
 
