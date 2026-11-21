@@ -31,13 +31,36 @@ let
     );
   opEnergyFrontendModule = import ./overlays/op-energy-frontend/frontend/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_REPO_LOCATION; };
   opEnergyFrontendPrototypeModule = import ./overlays/op-energy-prototype/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_PROTOTYPE_REPO_LOCATION; };
-  opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION; };
+  opEnergyFrontendMVPModule = import ./overlays/op-energy-mvp/module-frontend.nix {
+    GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_FRONTEND_MVP_REPO_LOCATION;
+    TELEGRAM_INVITE_URL = telegramInviteURL;
+    TELEGRAM_BOT_NAME = telegramBotName;
+  };
   opEnergyBackendModule = import ./overlays/op-energy-blockspan-service/op-energy-backend/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_REPO_LOCATION; };
   opEnergyAccountServiceModule = import ./overlays/op-energy/oe-account-service/op-energy-account-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyOfferServiceModule = import ./overlays/op-energy/oe-offer-service/op-energy-offer-service/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_ACCOUNT_REPO_LOCATION; };
   opEnergyApiSwaggerUIModule = import ./overlays/op-energy-api-swagger-ui/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_API_SWAGGER_UI_REPO_LOCATION; };
   opEnergyLITDModule = import ./overlays/op-energy-ln/litd/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
   opEnergyLNBITSModule = import ./overlays/op-energy-ln/lnbits/module-backend.nix { GIT_COMMIT_HASH = GIT_COMMIT_HASH OP_ENERGY_LN_REPO_LOCATION; };
+  # a setting, which differs between this instance and the production one,
+  # read from a file outside git, as the bitcoind psk above is. host.nix is
+  # the same file on every instance, so a value written here would be the
+  # same everywhere -- and dev and production mirror different telegram
+  # groups.
+  #
+  # Absent, the setting is not set at all: the offer service then follows no
+  # group, and the frontend shows neither the Join Telegram nor the Connect
+  # Telegram button, which is the right state for an instance, which mirrors
+  # no chat.
+  privateSetting = name:
+    let path = "/etc/nixos/private/" + name;
+    in if builtins.pathExists path
+       then lib.strings.removeSuffix "\n" (builtins.readFile path)
+       else "";
+  telegramChatId = privateSetting "TELEGRAM_CHAT_ID";
+  telegramInviteURL = privateSetting "TELEGRAM_INVITE_URL";
+  telegramBotName = privateSetting "TELEGRAM_BOT_NAME";
+
   local_settings = import ./local_settings.nix env;
 in
 {
@@ -114,6 +137,11 @@ in
     credentials_locations = {
       DB_PASSWORD_SECRET =  "/etc/nixos/private/OP_ENERGY_OFFER_DB_PASSWORD_SECRET";
       INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
+    } // lib.optionalAttrs (telegramChatId != "") {
+      # the module strips the suffix to name the config key, so this is read
+      # as TELEGRAM_BOT_TOKEN. Named only where there is a group to follow,
+      # as systemd refuses to start a unit, whose credential file is missing
+      TELEGRAM_BOT_TOKEN_SECRET = "/etc/nixos/private/TELEGRAM_BOT_TOKEN_SECRET";
     };
     extraConfig = {
       DB_PORT = 5432;
@@ -123,6 +151,10 @@ in
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 60;
       ACCOUNT_SERVICE_API_URL = "http://127.0.0.1:8899";
+    } // lib.optionalAttrs (telegramChatId != "") {
+      # fromJSON rather than lib.toInt: a telegram supergroup's id is
+      # negative, and toInt has not always accepted a leading minus
+      TELEGRAM_CHAT_ID = builtins.fromJSON telegramChatId;
     };
   };
 
