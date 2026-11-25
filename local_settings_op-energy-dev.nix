@@ -62,10 +62,6 @@ in
         # Ensure that the web server you use can read the generated certs
         # Take a look at the group option for the web server you choose.
         group = "nginx";
-        # Since we have a wildcard vhost to handle port 80,
-        # we can generate certs for anything!
-        # Just make sure your DNS resolves them.
-        extraDomainNames = [ "dev-exchange.op-energy.info" ];
       };
     };
   };
