@@ -90,6 +90,8 @@ in
       ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_TOKEN_ENCRYPTION_PRIVATE_KEY_SECRET";
       INTERNAL_SERVICE_SHARED_SECRET_SECRET = "/etc/nixos/private/INTERNAL_SERVICE_SHARED_SECRET";
       SECRET_SALT_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_SECRET_SALT_SECRET";
+      LNBITS_INVOICE_KEY_SECRET = "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_INVOICE_KEY";
+      LNBITS_ADMIN_KEY_SECRET =  "/etc/nixos/private/OP_ENERGY_ACCOUNT_LNBITS_ADMIN_KEY";
     };
     extraConfig = {
       DB_PORT = 5432;
@@ -98,6 +100,19 @@ in
       PROMETHEUS_PORT = 7899;
       LOG_LEVEL_MIN = "Debug";
       SCHEDULER_POLL_RATE_SECS = 10;
+      WALLET_BACKEND = "lnbits";
+      # this host's own LNbits (services.lnbits below): the account service
+      # reaches it over loopback, so the API keys never leave the machine
+      LNBITS_API_URL = "http://127.0.0.1:8231";
+      # every account is credited this at registration, out of the wallet
+      # named above like any other balance, and an account is free to
+      # create. The service no longer refuses the two together -- the
+      # check, which did, was dropped so a tester can trade without being
+      # paid in first -- so this is the deployment saying it is content
+      # for the sats to be given away. It holds while that wallet is
+      # signet, where they cost nothing, and goes to 0 before it is
+      # pointed at a wallet whose sats are worth something
+      STARTING_BALANCE_SATS = 300000;
     };
   };
 
